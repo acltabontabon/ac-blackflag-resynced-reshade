@@ -7,17 +7,14 @@ look, plus a light detail/fidelity pass.
 All parameter names are verified against the actual shader sources
 ([CeeJayDK/SweetFX](https://github.com/CeeJayDK/SweetFX),
 [crosire/reshade-shaders](https://github.com/crosire/reshade-shaders),
-[BlueSkyDefender/AstrayFX](https://github.com/BlueSkyDefender/AstrayFX),
-[martymcmodding/qUINT](https://github.com/martymcmodding/qUINT)) as shipped by the
+[BlueSkyDefender/AstrayFX](https://github.com/BlueSkyDefender/AstrayFX)) as shipped by the
 ReShade 6.x installer, so every value loads exactly as written - no silent fallbacks to
 shader defaults.
 
 Tested on: **Windows 11 · NVIDIA RTX 5070 Ti (16 GB) · AMD Ryzen 7 7800X3D · 32 GB RAM.**
-Eleven of the twelve effects are lightweight screen-space passes; MXAO (depth-based
-ambient occlusion) is the heavier one, but at these settings the total cost stays
-comfortably small on this class of hardware. On mid-range GPUs, drop
-`MXAO_GLOBAL_SAMPLE_QUALITY_PRESET` to `2` and/or `MXAO_GLOBAL_RENDER_SCALE` to `0.75`
-before touching anything else.
+All nine active effects are lightweight screen-space passes (no depth-buffer ray marching),
+so the performance cost is negligible on this class of hardware and should stay small even
+on mid-range GPUs.
 
 ## Screenshots
 
@@ -33,100 +30,81 @@ detail fourth, finish last:
 ### Stage 0 - Cleanup
 
 - **SMAA** - morphological anti-aliasing on the raw frame, before anything downstream can
-  sharpen the jaggies. Uses luma edge detection (no depth buffer required) with the
-  threshold lowered to `0.08` and search steps raised to `48`, so near-horizontal edges -
-  stair treads, ship railings, rigging lines - resolve into smooth gradients instead of
-  staircases.
+  sharpen the jaggies. Uses luma edge detection (no depth buffer required) at threshold
+  `0.10` with `32` search steps - close to shader defaults, tuned down from an earlier,
+  more aggressive pass that over-smoothed low-contrast edges and read as an obvious
+  ReShade effect.
 - **Deband** - dithers away color banding in smooth gradients (skies, ocean, haze) before
   any later pass can amplify it. Runs at default detection thresholds with a single
   iteration; visually invisible except where banding would have appeared.
 
-### Stage 0.5 - Lighting (depth-based)
-
-- **MXAO** - screen-space ambient occlusion in GTAO mode (`MXAO_HIGH_QUALITY=1`), which is
-  the physically-based variant with no halo artifacts. Adds the contact shadows the game's
-  baked AO misses - under ledges, between planks, where props meet the ground - so flat
-  scenes gain real depth. Amount is kept at `0.70` (below neutral) because it stacks on top
-  of the game's own AO; a depth fade-out at `0.4` keeps distant haze and sky untouched.
-
-It runs **before** the color grade, so the de-yellowing pass tames its output too.
-
 > [!NOTE]
-> Bloom is deliberately **not** part of this preset. Injector-level bloom shaders bring
-> their own auto-exposure, which fights the game's built-in eye adaptation - the result is
-> a darkened image and visible exposure flicker. The remake's native bloom is already good;
-> leave it to the game.
+> Bloom and MXAO (depth-based ambient occlusion) were both tried and removed. Bloom's
+> auto-exposure fought the game's built-in eye adaptation, causing a darkened image with
+> visible exposure flicker. MXAO flickered too - this remake's depth buffer isn't stable
+> enough for screen-space AO to lock onto. Both effects need something this game doesn't
+> reliably provide, so this preset sticks to static, depth-independent passes only. The
+> remake's native lighting and AO are already good; leave them to the game.
 
 ### Stage 1 - Base color correction (the de-yellowing)
 
-- **LiftGammaGain** - the main fix. Blue midtone gamma is raised (`1.035`) and red lowered
-  (`0.98`), directly countering the warm cast in the midtones where it lives, with matching
-  hair-width adjustments to shadows (lift) and highlights (gain). Exposure is untouched.
-- **Tonemap** - a tiny `Defog` (`0.02`) with a **warm** fog color (`1.0, 0.8, 0.45`).
-  Defog subtracts the fog color from the frame, so a warm fog color cancels the game's warm
-  atmospheric haze layer specifically. Also applies a small global desaturation (`-0.05`),
-  since the vanilla grade oversaturates, and a whisper of bleach-bypass (`0.02`).
+- **LiftGammaGain** - the main fix, softened further from earlier passes. Blue midtone
+  gamma is raised only slightly (`1.018`) and red lowered a little (`0.988`) to counter the
+  warm cast without pushing shadows toward cyan; blue lift is left at neutral (`1.0`) since
+  raising it darkened shadows toward blue faster than gamma/gain alone.
+- **Tonemap** - `Defog` is off (`0.0`). LiftGammaGain now carries all of the de-yellowing,
+  and running Defog alongside it double-corrected the warmth out of the image. The fog
+  color stays **warm** (`1.0, 0.8, 0.45`) so re-enabling Defog later still cancels the right
+  tint. A small global desaturation (`-0.04`) and a slight `-0.01` exposure trim rein in
+  highlights; bleach-bypass is off.
 
 ### Stage 2 - Filmic shaping
 
-- **Curves** - a gentle S-curve (`0.12` contrast) applied to **luma only**, so the added
-  contrast never pumps saturation back up.
-- **FakeHDR** - static local dynamic-range expansion: shadows get deeper, highlights get
-  brighter, midtone detail gains "pop". Unlike bloom-style shaders it has **no exposure or
-  adaptation logic** - the same pixel always maps the same way - so it cannot pump or
-  flicker. Power is kept at `1.15` (below the `1.30` default) since Curves already carries
-  global contrast.
-- **Vibrance** - selective saturation (`0.10`) with the RGB balance weighted away from red
-  (`0.70`) and toward blue (`1.25`): ocean and jungle read rich again without re-warming
-  skin tones, sand, and stone.
+- **Curves** - a gentle S-curve (`0.09` contrast) applied to **luma only**, so the added
+  contrast doesn't pump saturation back up.
+- **Vibrance** - light selective saturation (`0.04`) with the RGB balance nudged only
+  slightly off 1:1:1 (`0.95 / 1.00 / 1.05`): ocean and jungle read a touch richer without
+  visibly cooling skin tones, sand, or sails.
 
 ### Stage 3 - Detail & fidelity
 
-- **Clarity** - local contrast at moderate strength (`0.25`), blend-masked so deep shadows
-  and near-white highlights are excluded. This adds the "crisp midtone detail" look without
-  halos or the HDR-photo effect.
+- **Clarity** - local contrast at low strength (`0.12`), blend-masked so deep shadows and
+  near-white highlights are excluded, with the dark-side intensity lowered (`0.30`) so
+  shadow-side foliage and rigging don't gain contrast faster than the sunlit side. This
+  reduces (not eliminates) halo risk at edges.
 - **CAS (AMD FidelityFX Contrast Adaptive Sharpening)** - the adaptive successor to
-  classic sharpening: it sharpens soft, low-contrast areas strongly and automatically backs
-  off where contrast is already high, so it never rings or halos - and never re-jags the
-  edges SMAA smoothed in Stage 0. Full strength (`1.0`) is safe precisely because of that
-  adaptivity.
+  classic sharpening: it sharpens soft, low-contrast areas and backs off where contrast is
+  already high, so it's less prone to ringing than uniform sharpening. Run under half
+  strength (`0.4`) to stay clear of visible sharpening on faces and sails.
 
 ### Stage 4 - Cinematic finish
 
-- **Vignette** - a subtle elliptical darkening (`-0.35`), wide radius, gradual falloff.
-  Present enough to focus the frame, not enough to read as an effect.
-- **FilmGrain** - faint grain (`0.15` intensity) with a high signal-to-noise setting (`8`)
-  so it lives in the shadows and stays out of bright sky and sand - reads as film, not
-  sensor noise.
+- **Vignette** - a light elliptical darkening (`-0.10`), wide radius, gradual falloff.
+  Present enough to draw focus without reading as an added effect.
+
+> [!NOTE]
+> **FakeHDR and FilmGrain are not part of the active chain.** FakeHDR's highlight expansion
+> stacked with Clarity/CAS read as overexposed in bright Caribbean daylight, and grain adds
+> visible texture noise during normal play - both fight the "natural, not stylized" goal.
+> FilmGrain's config is left commented out at the bottom of the `.ini` for screenshot use:
+> uncomment it, add `FilmGrain@FilmGrain.fx` to `Techniques`/`TechniqueSorting`, and reload
+> the preset.
 
 ## Install
 
 1. Download ReShade **6.7.3** from [reshade.me](https://reshade.me/) and run the installer.
 2. Point it at the game's main executable (the one you actually launch to play - not a
    launcher/updater). Let it auto-detect the rendering API.
-3. When the installer asks which effect packages to install, check these four:
-   - **Standard effects** - provides `Deband` (and `DisplayDepth` for the depth check below)
+3. When the installer asks which effect packages to install, check these three:
+   - **Standard effects** - provides `Deband`
    - **SweetFX by CeeJay.dk** - provides `SMAA`, `LiftGammaGain`, `Tonemap`, `Curves`,
-     `FakeHDR`, `Vibrance`, `CAS`, `Vignette`, `FilmGrain`
+     `Vibrance`, `CAS`, `Vignette` (and `FilmGrain`, used only if you enable the optional
+     block described above)
    - **AstrayFX by BlueSkyDefender** - provides `Clarity`
-   - **qUINT by Marty McFly** - provides `MXAO`
 4. Copy `AC4BF_Natural_Cinematic.ini` next to the game executable (or anywhere you like).
 5. Launch the game, press **Home** to open the ReShade overlay, and select the preset in
-   the preset browser at the top. All twelve techniques enable automatically in the correct
-   order.
-
-### Depth buffer (required for MXAO)
-
-MXAO is the one effect here that needs the game's **depth buffer**. Verify it once:
-
-1. In the ReShade overlay, enable the `DisplayDepth` shader (ships with Standard effects).
-2. You should see a grayscale depth view (near = dark, far = light) on one half and normals
-   on the other. If so, disable `DisplayDepth` again - you're done.
-3. If instead it's solid black/white: open the **Add-ons** tab → **Generic Depth**, and try
-   the listed depth buffer candidates until the preview looks right. Usually the highest-
-   resolution candidate is the correct one.
-4. If depth stays unavailable, MXAO simply has no effect (everything else still works).
-   In that case disable the `MXAO` technique to save the GPU time.
+   the preset browser at the top. All nine active techniques enable automatically in the
+   correct order.
 
 > [!TIP]
 > If the game's own anti-aliasing option is available, SMAA stacks fine on top of it -
@@ -134,6 +112,33 @@ MXAO is the one effect here that needs the game's **depth buffer**. Verify it on
 > see any residual shimmer in motion, that's temporal aliasing, which no injector-level AA
 > can fully fix - prefer the game's TAA/DLSS/FSR option as the base and keep this SMAA pass
 > for the leftover static edges.
+
+## Warmer / cooler variants
+
+The whole grade lives in three `LiftGammaGain.fx` lines. To retune warmth without touching
+anything else, adjust only these (Tonemap's `FogColor`/`Defog` are tuned to the neutral
+values below and don't need to change for a mild shift):
+
+**Warmer** (dial back the blue-up/red-down correction by about a third):
+
+```ini
+[LiftGammaGain.fx]
+RGB_Lift=1.000000,1.000000,1.002000
+RGB_Gamma=0.992000,0.999000,1.012000
+RGB_Gain=0.996000,1.000000,1.004000
+```
+
+**Cooler** (push the correction about a third further than the default preset):
+
+```ini
+[LiftGammaGain.fx]
+RGB_Lift=1.000000,1.000000,1.004000
+RGB_Gamma=0.984000,0.997000,1.024000
+RGB_Gain=0.992000,1.000000,1.008000
+```
+
+Edit these three lines directly in the `.ini`, then reload the preset in the ReShade
+overlay (no restart needed).
 
 ## Files
 
@@ -145,6 +150,5 @@ MXAO is the one effect here that needs the game's **depth buffer**. Verify it on
 - SweetFX shaders by CeeJay.dk
 - SMAA by Jorge Jimenez et al. (ReShade port by CeeJay.dk, ships with SweetFX)
 - CAS (FidelityFX Contrast Adaptive Sharpening) by AMD (ReShade port by CeeJay.dk)
-- MXAO by Marty McFly (Pascal Gilcher) - [qUINT](https://github.com/martymcmodding/qUINT)
 - Deband by haasn / crosire
 - Clarity by Ioxa (distributed via AstrayFX by BlueSkyDefender)
