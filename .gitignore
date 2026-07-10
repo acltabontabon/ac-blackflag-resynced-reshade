@@ -25,3 +25,6 @@ reshade_cache/
 # System
 .env
 .env.local
+
+# Build output
+dist/

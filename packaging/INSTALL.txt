@@ -1,0 +1,50 @@
+AC4 Black Flag (Resynced) - Natural Cinematic ReShade Preset
+============================================================
+
+A neutral-cinematic ReShade preset that removes the game's heavy
+orange/yellow cast. Built for ReShade 6.7.3.
+
+Effect chain: SMAA -> Deband -> qUINT Lightroom -> CAS
+
+
+INSTALLATION
+------------
+
+1. Install ReShade 6.7.3 from https://reshade.me/
+   - Run the installer and point it at the game's main executable
+     (the one you launch to play, not a launcher/updater).
+   - Let it auto-detect the rendering API.
+
+2. When the installer asks which effect packages to install, check
+   these three:
+     - Standard effects              (provides Deband)
+     - SweetFX by CeeJay.dk          (provides SMAA and CAS)
+     - qUINT by Marty McFly          (provides Lightroom)
+
+3. Copy AC4BF_Natural_Cinematic.ini next to the game executable
+   (or into your ReShade preset folder).
+
+4. Launch the game, press HOME to open the ReShade overlay, and
+   select "AC4BF_Natural_Cinematic" from the preset browser at the
+   top. All four techniques enable automatically in the right order.
+
+
+NOTES
+-----
+
+- If Lightroom does not appear in the overlay, the qUINT package is
+  not installed - re-run the ReShade installer and add it.
+- SMAA stacks on top of the game's own anti-aliasing; if you have
+  TAA/DLSS/FSR available, keep it on as the base.
+- See README.md for the full breakdown of what each pass does and
+  how the grade is tuned.
+
+
+CREDITS
+-------
+
+- ReShade by crosire - https://reshade.me/
+- qUINT Lightroom by Marty McFly (Pascal Gilcher)
+- SMAA by Jorge Jimenez et al. (ReShade port by CeeJay.dk)
+- CAS (FidelityFX) by AMD (ReShade port by CeeJay.dk)
+- Deband by haasn / crosire

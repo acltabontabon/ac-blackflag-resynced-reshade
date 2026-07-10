@@ -133,6 +133,32 @@ gray, ease the temperature back toward `-0.12`.
 ## Files
 
 - `AC4BF_Natural_Cinematic.ini` - the preset.
+- `packaging/INSTALL.txt` - short install guide bundled inside the release zip.
+- `scripts/package.sh` - builds the Nexus-ready zip.
+- `.github/workflows/release.yml` - auto-builds the zip and publishes a GitHub Release on tag push.
+
+## Building a release
+
+To build the distributable zip locally (output goes to `dist/`, which is git-ignored):
+
+```sh
+./scripts/package.sh v1.0.0
+```
+
+This produces `dist/AC4BF-Natural-Cinematic-v1.0.0.zip` containing the `.ini`, this README,
+and `INSTALL.txt` at the top level - ready to upload to Nexus Mods.
+
+To cut a GitHub Release automatically, push a version tag:
+
+```sh
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+The `Release` workflow builds the same zip and attaches it to a new GitHub Release. Download
+that zip and upload it to Nexus, or link the release page. You can also trigger the workflow
+manually from the Actions tab for a dry run (builds the zip as a downloadable artifact without
+creating a release).
 
 ## Credits
 
