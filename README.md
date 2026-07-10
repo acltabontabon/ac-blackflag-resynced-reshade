@@ -17,9 +17,19 @@
 
 ## 📸 Before & After
 
-| Before | After |
-|:---:|:---:|
-| 🟠 Vanilla (orange grade) | ✨ Preset applied |
+Each shot is split down the middle — **left is vanilla** (the orange cast), **right is the preset**.
+
+**Havana rooftops**
+![Havana rooftops before/after](docs/images/comparison-havana-rooftops.jpg)
+
+**Harbor & open water**
+![Harbor before/after](docs/images/comparison-harbor.jpg)
+
+**Town square**
+![Town square before/after](docs/images/comparison-town-square.jpg)
+
+**Character faces & skin tones**
+![NPC faces before/after](docs/images/comparison-faces.jpg)
 
 ---
 
@@ -74,7 +84,13 @@ This is where the magic happens. A single selective color-grading pass replaces 
 | **GPU** | NVIDIA RTX 5070 Ti (tested) |
 | **CPU** | AMD Ryzen 7 7800X3D (tested) |
 | **RAM** | 32 GB (tested) |
-| **Impact** | Negligible – all passes are lightweight screen-space effects (no ray marching) |
+| **Impact** | Very low – all passes are lightweight screen-space effects (no ray marching). Cost scales with resolution, so expect a bit more at 4K than at 1080p |
+
+---
+
+## 🖥 Compatibility
+
+**Designed for SDR** – AC4 Black Flag outputs a standard 8-bit sRGB image, and every value in this preset (white balance, saturation, tone curves) is tuned for that. If you force HDR on top of the game via **Windows Auto HDR**, **NVIDIA RTX HDR**, or **Special K**, turn it off before using this preset — otherwise the grade will look wrong (shifted colors, crushed or blown highlights). The shaders aren't HDR-aware.
 
 ---
 
