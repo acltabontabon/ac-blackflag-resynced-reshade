@@ -48,23 +48,24 @@ detail fourth, finish last:
 
 ### Stage 1 - Base color correction (the de-yellowing)
 
-- **LiftGammaGain** - the main fix, softened further from earlier passes. Blue midtone
-  gamma is raised only slightly (`1.018`) and red lowered a little (`0.988`) to counter the
-  warm cast without pushing shadows toward cyan; blue lift is left at neutral (`1.0`) since
-  raising it darkened shadows toward blue faster than gamma/gain alone.
+- **LiftGammaGain** - the main fix. Red gamma/gain trimmed further (`0.982` / `0.990`) to
+  cut orange in direct-sun skin, stone, sand, and sunlit cloth; blue midtone gamma stays
+  mild (`1.018`) and blue lift stays neutral (`1.0`) since raising it darkened shadows
+  toward cyan faster than gamma/gain alone.
 - **Tonemap** - `Defog` is off (`0.0`). LiftGammaGain now carries all of the de-yellowing,
   and running Defog alongside it double-corrected the warmth out of the image. The fog
   color stays **warm** (`1.0, 0.8, 0.45`) so re-enabling Defog later still cancels the right
-  tint. A small global desaturation (`-0.04`) and a slight `-0.01` exposure trim rein in
-  highlights; bleach-bypass is off.
+  tint. Global desaturation eased to `-0.055` to soften bright sunlit surfaces, and the
+  `-0.01` exposure trim is unchanged; bleach-bypass is off.
 
 ### Stage 2 - Filmic shaping
 
-- **Curves** - a gentle S-curve (`0.09` contrast) applied to **luma only**, so the added
-  contrast doesn't pump saturation back up.
-- **Vibrance** - light selective saturation (`0.04`) with the RGB balance nudged only
-  slightly off 1:1:1 (`0.95 / 1.00 / 1.05`): ocean and jungle read a touch richer without
-  visibly cooling skin tones, sand, or sails.
+- **Curves** - a gentle S-curve (`0.085` contrast) applied to **luma only**, so the added
+  contrast doesn't pump saturation back up, and eased slightly so bright sunlit surfaces
+  look soft rather than harsh.
+- **Vibrance** - light selective saturation (`0.025`) with the RGB balance nudged only
+  slightly off 1:1:1 (`0.90 / 1.00 / 1.03`): a small blue preference tones down orange
+  without a visible cool cast, and reds/skin/sunlit walls read less intense overall.
 
 ### Stage 3 - Detail & fidelity
 
@@ -123,18 +124,18 @@ values below and don't need to change for a mild shift):
 
 ```ini
 [LiftGammaGain.fx]
-RGB_Lift=1.000000,1.000000,1.002000
-RGB_Gamma=0.992000,0.999000,1.012000
-RGB_Gain=0.996000,1.000000,1.004000
+RGB_Lift=1.000000,1.000000,1.001000
+RGB_Gamma=0.988000,0.999000,1.012000
+RGB_Gain=0.993000,1.000000,1.003000
 ```
 
 **Cooler** (push the correction about a third further than the default preset):
 
 ```ini
 [LiftGammaGain.fx]
-RGB_Lift=1.000000,1.000000,1.004000
-RGB_Gamma=0.984000,0.997000,1.024000
-RGB_Gain=0.992000,1.000000,1.008000
+RGB_Lift=1.000000,1.000000,1.003000
+RGB_Gamma=0.976000,0.997000,1.024000
+RGB_Gain=0.987000,1.000000,1.007000
 ```
 
 Edit these three lines directly in the `.ini`, then reload the preset in the ReShade
