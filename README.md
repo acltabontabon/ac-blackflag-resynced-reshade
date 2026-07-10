@@ -20,16 +20,16 @@
 Each shot is split down the middle — **left is vanilla** (the orange cast), **right is the preset**.
 
 **Havana rooftops**
-![Havana rooftops before/after](docs/images/comparison-havana-rooftops.jpg)
+![Havana rooftops before/after](docs/images/base/havana-rooftops.jpg)
 
 **Harbor & open water**
-![Harbor before/after](docs/images/comparison-harbor.jpg)
+![Harbor before/after](docs/images/base/harbor.jpg)
 
 **Town square**
-![Town square before/after](docs/images/comparison-town-square.jpg)
+![Town square before/after](docs/images/base/town-square.jpg)
 
 **Character faces & skin tones**
-![NPC faces before/after](docs/images/comparison-faces.jpg)
+![NPC faces before/after](docs/images/base/faces.jpg)
 
 ---
 
@@ -135,6 +135,24 @@ This game is light on modern GPUs, so there's usually headroom to render *above*
 
 ### Frame Generation
 Works fine with the preset — no changes needed. ReShade applies to the rendered frames as normal.
+
+---
+
+## 🧬 DLAA Variant
+
+Using **DLAA, DLSS, or TAA**? The download also includes **`AC4BF_OrangeBegone_DLAA.ini`**, with those tweaks already baked in — no overlay fiddling needed:
+
+- **SMAA removed** – your temporal AA already handles edges, so this is a pure fidelity + performance gain
+- **CAS raised to `0.40`** – recovers the slight softness DLAA/DLSS leaves behind
+- **Orange band tuned for skin** and a **gentler `-0.05` white balance**
+
+Load it exactly like the base preset — pick it in the ReShade preset browser.
+
+**Havana street**
+![DLAA street before/after](docs/images/dlaa/street.jpg)
+
+**Encounter**
+![DLAA encounter before/after](docs/images/dlaa/encounter.jpg)
 
 ---
 

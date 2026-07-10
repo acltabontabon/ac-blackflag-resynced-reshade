@@ -5,7 +5,16 @@ A no-nonsense ReShade preset that removes the game's heavy
 orange/yellow cast and leaves everything else alone. Built for
 ReShade 6.7.3.
 
-Effect chain: SMAA -> Deband -> qUINT Lightroom -> CAS
+This download includes two presets:
+
+  AC4BF_OrangeBegone.ini        Base preset (general use).
+                                Chain: SMAA -> Deband -> Lightroom -> CAS
+
+  AC4BF_OrangeBegone_DLAA.ini   For DLAA / DLSS / in-game TAA users.
+                                SMAA removed (your upscaler already
+                                anti-aliases), sharper CAS, orange band
+                                tuned for more natural skin.
+                                Chain: Deband -> Lightroom -> CAS
 
 
 INSTALLATION
@@ -22,12 +31,28 @@ INSTALLATION
      - SweetFX by CeeJay.dk          (provides SMAA and CAS)
      - qUINT by Marty McFly          (provides Lightroom)
 
-3. Copy AC4BF_OrangeBegone.ini next to the game executable
-   (or into your ReShade preset folder).
+3. Copy the .ini file(s) next to the game executable (or into your
+   ReShade preset folder). Copy both if you want to switch between them.
 
-4. Launch the game, press HOME to open the ReShade overlay, and
-   select "AC4BF_OrangeBegone" from the preset browser at the top.
-   All four techniques enable automatically in the right order.
+4. Launch the game, press HOME to open the ReShade overlay, and pick
+   a preset from the browser at the top:
+     - "AC4BF_OrangeBegone"        base preset
+     - "AC4BF_OrangeBegone_DLAA"   if you use DLAA / DLSS / TAA
+   Techniques enable automatically in the right order.
+
+
+WHICH ONE SHOULD I USE?
+-----------------------
+
+- Using DLAA, DLSS, or the game's TAA?  Use the DLAA variant. Those
+  already anti-alias the image, so the base preset's SMAA pass is
+  redundant and slightly softens detail.
+- Not using any of those (relying on the game's basic AA)?  Use the
+  base preset.
+
+See README.md for recommended in-game / NVIDIA Control Panel settings
+(anisotropic filtering, DLDSR, sharpening) and a full breakdown of the
+grade.
 
 
 NOTES
@@ -35,10 +60,8 @@ NOTES
 
 - If Lightroom does not appear in the overlay, the qUINT package is
   not installed - re-run the ReShade installer and add it.
-- SMAA stacks on top of the game's own anti-aliasing; if you have
-  TAA/DLSS/FSR available, keep it on as the base.
-- See README.md for the full breakdown of what each pass does and
-  how the grade is tuned.
+- Designed for SDR. Turn off Windows Auto HDR / NVIDIA RTX HDR for
+  this game, or the grade will look wrong.
 
 
 CREDITS

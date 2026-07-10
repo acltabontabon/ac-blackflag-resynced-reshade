@@ -2,6 +2,20 @@
 
 All notable changes to Orange Begone preset are documented here.
 
+## [1.1.0] – 2026-07-11
+
+### Added
+- **DLAA variant** (`AC4BF_OrangeBegone_DLAA.ini`) for NVIDIA DLAA / DLSS / TAA users:
+  SMAA removed (temporal AA already handles edges), CAS raised to 0.40, orange band
+  deepened for more natural skin, and a gentler -0.05 white-balance cooling.
+- Before/after comparison screenshots for both the base preset and the DLAA variant.
+- "Recommended Game & Driver Settings" section in the README (anti-aliasing guidance,
+  anisotropic filtering, NVIDIA DLDSR, frame generation).
+- SDR compatibility note (disable Auto HDR / RTX HDR).
+
+### Changed
+- Comparison images reorganized under `docs/images/base/` and `docs/images/dlaa/`.
+
 ## [1.0.0] – 2026-07-11
 
 ### Initial Release
