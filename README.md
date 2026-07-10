@@ -115,6 +115,29 @@ When the installer asks which effects to install, **check these three:**
 
 ---
 
+## 🎛 Recommended Game & Driver Settings
+
+The preset works out of the box, but a few settings help it look its best — especially if you use modern upscaling/AA.
+
+### If you use DLAA, DLSS, or in-game TAA
+These already anti-alias the frame *before* ReShade sees it, so the preset's **SMAA pass is redundant** and can slightly soften fine detail.
+- Open the ReShade overlay (**Home**) and **untick SMAA**. Leave Deband, Lightroom, and CAS on.
+- Since DLAA/DLSS leave the image a touch soft (and modern DLSS no longer sharpens for you), you can nudge **CAS `Sharpening`** up from `0.30` toward `0.40–0.50` for more crispness. Back off if edges look crunchy or start shimmering.
+
+### NVIDIA Control Panel
+- **Anisotropic filtering: 16×** (Manage 3D settings → Program Settings → add the game). Keeps ground, decks, and roads sharp at oblique angles.
+- **Sharpen HDR is off** — make sure Windows Auto HDR / NVIDIA RTX HDR are disabled for this game (see [Compatibility](#-compatibility)).
+
+### Bigger fidelity at 1080p/1440p (optional) — NVIDIA DLDSR
+This game is light on modern GPUs, so there's usually headroom to render *above* your monitor's resolution and downsample. That adds real detail no sharpener can — the single biggest image-quality lever at low resolutions.
+- Enable **DSR/DLDSR** in NVIDIA Control Panel (e.g. **DLDSR 1.78×** or **2.25×**), then pick the higher resolution in-game.
+- Watch your framerate — heavy DLDSR **+ DLAA** is expensive. If you dip too low, use a lighter DLDSR factor, or switch DLAA → **DLSS Quality** to reclaim performance while keeping the downsample.
+
+### Frame Generation
+Works fine with the preset — no changes needed. ReShade applies to the rendered frames as normal.
+
+---
+
 ## 🎓 Technical Notes
 
 > This preset uses **only static, depth-independent passes**. Earlier versions tried Bloom and MXAO (ambient occlusion) and removed both:
