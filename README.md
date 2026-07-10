@@ -7,14 +7,17 @@ look, plus a light detail/fidelity pass.
 All parameter names are verified against the actual shader sources
 ([CeeJayDK/SweetFX](https://github.com/CeeJayDK/SweetFX),
 [crosire/reshade-shaders](https://github.com/crosire/reshade-shaders),
-[BlueSkyDefender/AstrayFX](https://github.com/BlueSkyDefender/AstrayFX)) as shipped by the
+[BlueSkyDefender/AstrayFX](https://github.com/BlueSkyDefender/AstrayFX),
+[martymcmodding/qUINT](https://github.com/martymcmodding/qUINT)) as shipped by the
 ReShade 6.x installer, so every value loads exactly as written - no silent fallbacks to
 shader defaults.
 
 Tested on: **Windows 11 · NVIDIA RTX 5070 Ti (16 GB) · AMD Ryzen 7 7800X3D · 32 GB RAM.**
-All ten effects are lightweight screen-space passes (no depth-buffer ray marching), so the
-performance cost is negligible on this class of hardware and should stay small even on
-mid-range GPUs.
+Ten of the twelve effects are lightweight screen-space passes; MXAO (depth-based ambient
+occlusion) and qUINT Bloom are the heavier two, but at these settings the total cost stays
+comfortably small on this class of hardware. On mid-range GPUs, drop
+`MXAO_GLOBAL_SAMPLE_QUALITY_PRESET` to `2` and/or `MXAO_GLOBAL_RENDER_SCALE` to `0.75`
+before touching anything else.
 
 ## Screenshots
 
@@ -37,6 +40,21 @@ detail fourth, finish last:
 - **Deband** - dithers away color banding in smooth gradients (skies, ocean, haze) before
   any later pass can amplify it. Runs at default detection thresholds with a single
   iteration; visually invisible except where banding would have appeared.
+
+### Stage 0.5 - Lighting (depth-based)
+
+- **MXAO** - screen-space ambient occlusion in GTAO mode (`MXAO_HIGH_QUALITY=1`), which is
+  the physically-based variant with no halo artifacts. Adds the contact shadows the game's
+  baked AO misses - under ledges, between planks, where props meet the ground - so flat
+  scenes gain real depth. Amount is kept at `0.70` (below neutral) because it stacks on top
+  of the game's own AO; a depth fade-out at `0.4` keeps distant haze and sky untouched.
+- **qUINT Bloom** - multi-layer adaptive bloom. The curve is pushed high (`7.0`) so only
+  genuine highlights bloom - sun glints, lanterns, bright plaster - rather than hazing the
+  whole frame, and bloom saturation is reduced so it can't re-warm what Stage 1 removes.
+  Scene adaptation gives a gentle, natural auto-exposure when moving between interiors and
+  Caribbean daylight.
+
+Both run **before** the color grade, so the de-yellowing pass tames their output too.
 
 ### Stage 1 - Base color correction (the de-yellowing)
 
@@ -77,15 +95,29 @@ detail fourth, finish last:
 1. Download ReShade **6.7.3** from [reshade.me](https://reshade.me/) and run the installer.
 2. Point it at the game's main executable (the one you actually launch to play - not a
    launcher/updater). Let it auto-detect the rendering API.
-3. When the installer asks which effect packages to install, check these three:
+3. When the installer asks which effect packages to install, check these four:
    - **Standard effects** - provides `SMAA` and `Deband`
    - **SweetFX by CeeJay.dk** - provides `LiftGammaGain`, `Tonemap`, `Curves`, `Vibrance`,
      `LumaSharpen`, `Vignette`, `FilmGrain`
    - **AstrayFX by BlueSkyDefender** - provides `Clarity`
+   - **qUINT by Marty McFly** - provides `MXAO` and `Bloom`
 4. Copy `AC4BF_Natural_Cinematic.ini` next to the game executable (or anywhere you like).
 5. Launch the game, press **Home** to open the ReShade overlay, and select the preset in
-   the preset browser at the top. All ten techniques enable automatically in the correct
+   the preset browser at the top. All twelve techniques enable automatically in the correct
    order.
+
+### Depth buffer (required for MXAO)
+
+MXAO is the one effect here that needs the game's **depth buffer**. Verify it once:
+
+1. In the ReShade overlay, enable the `DisplayDepth` shader (ships with Standard effects).
+2. You should see a grayscale depth view (near = dark, far = light) on one half and normals
+   on the other. If so, disable `DisplayDepth` again - you're done.
+3. If instead it's solid black/white: open the **Add-ons** tab → **Generic Depth**, and try
+   the listed depth buffer candidates until the preview looks right. Usually the highest-
+   resolution candidate is the correct one.
+4. If depth stays unavailable, MXAO simply has no effect (everything else still works).
+   In that case disable the `MXAO` technique to save the GPU time.
 
 > [!TIP]
 > If the game's own anti-aliasing option is available, SMAA stacks fine on top of it -
@@ -103,5 +135,6 @@ detail fourth, finish last:
 - ReShade by crosire - [reshade.me](https://reshade.me/)
 - SweetFX shaders by CeeJay.dk
 - SMAA by Jorge Jimenez et al. (ReShade port in standard effects)
+- MXAO and qUINT Bloom by Marty McFly (Pascal Gilcher) - [qUINT](https://github.com/martymcmodding/qUINT)
 - Deband by haasn / crosire
 - Clarity by Ioxa (distributed via AstrayFX by BlueSkyDefender)
