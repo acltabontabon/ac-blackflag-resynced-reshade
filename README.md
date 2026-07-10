@@ -53,22 +53,28 @@ LUT-based and must run before sharpening, hence its position here.
 - **Cooler white balance** - global temperature `-0.10` shifts the whole frame off the
   warm cast (toward blue ~202°). This is the main, decisive move - not a microscopic nudge -
   and it's what makes the OFF/ON toggle obvious.
-- **Orange & yellow saturation pulled down hardest** - orange `-0.30`, yellow `-0.20`, so
-  skin, sand, pale stone, blonde/brown hair, and cream fabric stop reading gold. Red is
-  only lightly trimmed (`-0.08`) so Edward's coat stays a rich, believable red.
-- **Warm-highlight luminance lowered** - orange exposure `-0.15`, yellow exposure `-0.10`,
-  so bright sunlit skin, cloth, and ground keep visible texture instead of glowing.
+- **Orange & yellow saturation pulled down** - orange `-0.27`, yellow `-0.20`, so skin,
+  sand, pale stone, blonde/brown hair, and cream fabric don't read gold. Orange is eased
+  slightly (from a stronger earlier `-0.30`) so skin reads peach and alive rather than
+  ashy. Red is only lightly trimmed (`-0.08`) so Edward's coat stays a rich red.
+- **Warm-highlight luminance** - orange exposure `-0.10`, yellow exposure `-0.08`. These
+  are raised back a little from an earlier, darker pass: this is how sunlit skin, cloth, and
+  ground get their Caribbean energy back - through luminance, not saturation, so no orange
+  returns.
 - **Hue nudges** - yellow shifted slightly toward green (`+0.10`) so blondes read blonde,
   not gold; orange shifted toward red/peach (`-0.08`) so skin reads natural peach.
-- **Foliage protected** - green saturation `+0.08` restores natural green after the global
-  cooling, so vegetation stays green rather than olive.
-- **Sky left clean** - blue and aqua saturation stay neutral (`0`) so the sky/clouds keep
-  their believable blue-white balance and don't turn turquoise.
+- **Foliage & sky** - green saturation `+0.12` keeps vegetation green rather than muted;
+  blue saturation `+0.06` cleans up a gray/lavender sky. Aqua stays neutral (`0`) so nothing
+  turns turquoise and clouds stay neutral white.
+- **Green/cyan cast fix** - a very small tint `-0.03` (toward magenta) cancels the faint
+  green/cyan lean in shadows and neutral architecture, kept subtle enough that walls and
+  foliage don't go pink.
 
-**Tone:** global exposure `-0.05`, highlights curve `-0.30`, whites curve `-0.15` bring the
-overexposed warm highlights back into range; shadows are raised only slightly (`+0.05`),
-blacks left at `0` to preserve depth without crushing dark interiors, and contrast is a
-gentle `+0.04` so midtones stay readable without re-harshening the image.
+**Tone:** global exposure `-0.02`, highlights curve `-0.27`, whites curve `-0.10` keep the
+warm highlights in range while leaving a little more brightness and highlight texture than
+the earlier, flatter pass; shadows are raised only slightly (`+0.05`), blacks left at `0` to
+preserve depth without crushing dark interiors, and contrast is `+0.08` - a restrained
+S-curve for separation and dimensionality without re-harshening the image.
 
 ### Stage 2 - Sharpening
 
