@@ -1,18 +1,20 @@
 # AC4 Black Flag (Resynced) - Natural Cinematic ReShade Preset
 
 A ReShade **6.7.3** preset for Assassin's Creed IV: Black Flag Resynced that removes the
-game's baked-in yellow/sepia grade and replaces it with a neutral, filmic-but-restrained
-look, plus a light detail/fidelity pass.
+game's strong baked-in orange/yellow grade and replaces it with a neutral-cinematic look.
+The heavy lifting is done by a single selective color-grading pass (qUINT Lightroom) rather
+than a stack of blunt global adjustments, so the correction is decisive and toggling ReShade
+shows a clear, obvious difference.
 
 All parameter names are verified against the actual shader sources
-([CeeJayDK/SweetFX](https://github.com/CeeJayDK/SweetFX),
-[crosire/reshade-shaders](https://github.com/crosire/reshade-shaders),
-[BlueSkyDefender/AstrayFX](https://github.com/BlueSkyDefender/AstrayFX)) as shipped by the
+([martymcmodding/qUINT](https://github.com/martymcmodding/qUINT),
+[CeeJayDK/SweetFX](https://github.com/CeeJayDK/SweetFX),
+[crosire/reshade-shaders](https://github.com/crosire/reshade-shaders)) as shipped by the
 ReShade 6.x installer, so every value loads exactly as written - no silent fallbacks to
 shader defaults.
 
 Tested on: **Windows 11 · NVIDIA RTX 5070 Ti (16 GB) · AMD Ryzen 7 7800X3D · 32 GB RAM.**
-All nine active effects are lightweight screen-space passes (no depth-buffer ray marching),
+All four active effects are lightweight screen-space passes (no depth-buffer ray marching),
 so the performance cost is negligible on this class of hardware and should stay small even
 on mid-range GPUs.
 
@@ -20,76 +22,67 @@ on mid-range GPUs.
 
 | Before                   | After              |
 |--------------------------|--------------------|
-| _vanilla (yellow grade)_ | _preset applied_   |
+| _vanilla (orange grade)_ | _preset applied_   |
 
 ## What the preset does
 
-Effects run in this exact order - cleanup first, color correction second, shaping third,
-detail fourth, finish last:
+Four passes, in this exact order - clean up, grade, sharpen:
+
+```
+SMAA  ->  Deband  ->  Lightroom  ->  CAS
+```
 
 ### Stage 0 - Cleanup
 
 - **SMAA** - morphological anti-aliasing on the raw frame, before anything downstream can
   sharpen the jaggies. Uses luma edge detection (no depth buffer required) at threshold
-  `0.10` with `32` search steps - close to shader defaults, tuned down from an earlier,
-  more aggressive pass that over-smoothed low-contrast edges and read as an obvious
-  ReShade effect.
+  `0.10` with `32` search steps.
 - **Deband** - dithers away color banding in smooth gradients (skies, ocean, haze) before
-  any later pass can amplify it. Runs at default detection thresholds with a single
-  iteration; visually invisible except where banding would have appeared.
+  the grade can amplify it. Runs at default detection thresholds with a single iteration;
+  visually invisible except where banding would have appeared.
+
+### Stage 1 - Grade (qUINT Lightroom)
+
+A single static color-grading pass replaces the old LiftGammaGain + Tonemap + Curves +
+Vibrance stack. One shader now handles white balance, exposure/tone shaping, and per-band
+(HSL) selective color, so no two passes fight over the same operation. Lightroom is
+LUT-based and must run before sharpening, hence its position here.
+
+**How the orange/yellow is selectively reduced:**
+
+- **Cooler white balance** - global temperature `-0.10` shifts the whole frame off the
+  warm cast (toward blue ~202°). This is the main, decisive move - not a microscopic nudge -
+  and it's what makes the OFF/ON toggle obvious.
+- **Orange & yellow saturation pulled down hardest** - orange `-0.30`, yellow `-0.20`, so
+  skin, sand, pale stone, blonde/brown hair, and cream fabric stop reading gold. Red is
+  only lightly trimmed (`-0.08`) so Edward's coat stays a rich, believable red.
+- **Warm-highlight luminance lowered** - orange exposure `-0.15`, yellow exposure `-0.10`,
+  so bright sunlit skin, cloth, and ground keep visible texture instead of glowing.
+- **Hue nudges** - yellow shifted slightly toward green (`+0.10`) so blondes read blonde,
+  not gold; orange shifted toward red/peach (`-0.08`) so skin reads natural peach.
+- **Foliage protected** - green saturation `+0.08` restores natural green after the global
+  cooling, so vegetation stays green rather than olive.
+- **Sky left clean** - blue and aqua saturation stay neutral (`0`) so the sky/clouds keep
+  their believable blue-white balance and don't turn turquoise.
+
+**Tone:** global exposure `-0.05`, highlights curve `-0.30`, whites curve `-0.15` bring the
+overexposed warm highlights back into range; shadows are raised only slightly (`+0.05`),
+blacks left at `0` to preserve depth without crushing dark interiors, and contrast is a
+gentle `+0.04` so midtones stay readable without re-harshening the image.
+
+### Stage 2 - Sharpening
+
+- **CAS (AMD FidelityFX Contrast Adaptive Sharpening)** - sharpens soft, low-contrast areas
+  and backs off where contrast is already high, so it's less prone to ringing than uniform
+  sharpening. Runs after the grade at `0.30` - crisp detail on faces and sails at 1080p
+  without a visible "sharpened" edge.
 
 > [!NOTE]
-> Bloom and MXAO (depth-based ambient occlusion) were both tried and removed. Bloom's
-> auto-exposure fought the game's built-in eye adaptation, causing a darkened image with
-> visible exposure flicker. MXAO flickered too - this remake's depth buffer isn't stable
-> enough for screen-space AO to lock onto. Both effects need something this game doesn't
-> reliably provide, so this preset sticks to static, depth-independent passes only. The
-> remake's native lighting and AO are already good; leave them to the game.
-
-### Stage 1 - Base color correction (the de-yellowing)
-
-- **LiftGammaGain** - the main fix. Red gamma/gain trimmed further (`0.982` / `0.990`) to
-  cut orange in direct-sun skin, stone, sand, and sunlit cloth; blue midtone gamma stays
-  mild (`1.018`) and blue lift stays neutral (`1.0`) since raising it darkened shadows
-  toward cyan faster than gamma/gain alone.
-- **Tonemap** - `Defog` is off (`0.0`). LiftGammaGain now carries all of the de-yellowing,
-  and running Defog alongside it double-corrected the warmth out of the image. The fog
-  color stays **warm** (`1.0, 0.8, 0.45`) so re-enabling Defog later still cancels the right
-  tint. Global desaturation eased to `-0.055` to soften bright sunlit surfaces, and the
-  `-0.01` exposure trim is unchanged; bleach-bypass is off.
-
-### Stage 2 - Filmic shaping
-
-- **Curves** - a gentle S-curve (`0.085` contrast) applied to **luma only**, so the added
-  contrast doesn't pump saturation back up, and eased slightly so bright sunlit surfaces
-  look soft rather than harsh.
-- **Vibrance** - light selective saturation (`0.025`) with the RGB balance nudged only
-  slightly off 1:1:1 (`0.90 / 1.00 / 1.03`): a small blue preference tones down orange
-  without a visible cool cast, and reds/skin/sunlit walls read less intense overall.
-
-### Stage 3 - Detail & fidelity
-
-- **Clarity** - local contrast at low strength (`0.12`), blend-masked so deep shadows and
-  near-white highlights are excluded, with the dark-side intensity lowered (`0.30`) so
-  shadow-side foliage and rigging don't gain contrast faster than the sunlit side. This
-  reduces (not eliminates) halo risk at edges.
-- **CAS (AMD FidelityFX Contrast Adaptive Sharpening)** - the adaptive successor to
-  classic sharpening: it sharpens soft, low-contrast areas and backs off where contrast is
-  already high, so it's less prone to ringing than uniform sharpening. Run under half
-  strength (`0.4`) to stay clear of visible sharpening on faces and sails.
-
-### Stage 4 - Cinematic finish
-
-- **Vignette** - a light elliptical darkening (`-0.10`), wide radius, gradual falloff.
-  Present enough to draw focus without reading as an added effect.
-
-> [!NOTE]
-> **FakeHDR and FilmGrain are not part of the active chain.** FakeHDR's highlight expansion
-> stacked with Clarity/CAS read as overexposed in bright Caribbean daylight, and grain adds
-> visible texture noise during normal play - both fight the "natural, not stylized" goal.
-> FilmGrain's config is left commented out at the bottom of the `.ini` for screenshot use:
-> uncomment it, add `FilmGrain@FilmGrain.fx` to `Techniques`/`TechniqueSorting`, and reload
-> the preset.
+> This preset uses only static, depth-independent passes. Earlier revisions tried Bloom and
+> MXAO (depth-based ambient occlusion) and removed both: Bloom's auto-exposure fought the
+> game's built-in eye adaptation (darkened image, exposure flicker) and MXAO shimmered on
+> this remake's unstable depth buffer. FakeHDR, Defog, LUTs, and film grain are intentionally
+> not used - the goal is a clean neutral grade, not a stylized layer over the top.
 
 ## Install
 
@@ -98,13 +91,11 @@ detail fourth, finish last:
    launcher/updater). Let it auto-detect the rendering API.
 3. When the installer asks which effect packages to install, check these three:
    - **Standard effects** - provides `Deband`
-   - **SweetFX by CeeJay.dk** - provides `SMAA`, `LiftGammaGain`, `Tonemap`, `Curves`,
-     `Vibrance`, `CAS`, `Vignette` (and `FilmGrain`, used only if you enable the optional
-     block described above)
-   - **AstrayFX by BlueSkyDefender** - provides `Clarity`
+   - **SweetFX by CeeJay.dk** - provides `SMAA` and `CAS`
+   - **qUINT by Marty McFly / Pascal Gilcher** - provides `Lightroom` (`qUINT_lightroom.fx`)
 4. Copy `AC4BF_Natural_Cinematic.ini` next to the game executable (or anywhere you like).
 5. Launch the game, press **Home** to open the ReShade overlay, and select the preset in
-   the preset browser at the top. All nine active techniques enable automatically in the
+   the preset browser at the top. All four active techniques enable automatically in the
    correct order.
 
 > [!TIP]
@@ -114,32 +105,25 @@ detail fourth, finish last:
 > can fully fix - prefer the game's TAA/DLSS/FSR option as the base and keep this SMAA pass
 > for the leftover static edges.
 
-## Warmer / cooler variants
+## Stronger anti-orange variant
 
-The whole grade lives in three `LiftGammaGain.fx` lines. To retune warmth without touching
-anything else, adjust only these (Tonemap's `FogColor`/`Defog` are tuned to the neutral
-values below and don't need to change for a mild shift):
-
-**Warmer** (dial back the blue-up/red-down correction by about a third):
+If direct-sun scenes are still too warm for your taste, push the same Lightroom controls
+further. Change only these lines in the `[qUINT_lightroom.fx]` section, then reload the
+preset in the overlay (no restart needed):
 
 ```ini
-[LiftGammaGain.fx]
-RGB_Lift=1.000000,1.000000,1.001000
-RGB_Gamma=0.988000,0.999000,1.012000
-RGB_Gain=0.993000,1.000000,1.003000
+[qUINT_lightroom.fx]
+LIGHTROOM_ORANGE_SATURATION=-0.400000
+LIGHTROOM_YELLOW_SATURATION=-0.280000
+LIGHTROOM_ORANGE_EXPOSURE=-0.200000
+LIGHTROOM_YELLOW_EXPOSURE=-0.150000
+LIGHTROOM_GLOBAL_TEMPERATURE=-0.140000
+LIGHTROOM_GREEN_SATURATION=0.120000
 ```
 
-**Cooler** (push the correction about a third further than the default preset):
-
-```ini
-[LiftGammaGain.fx]
-RGB_Lift=1.000000,1.000000,1.003000
-RGB_Gamma=0.976000,0.997000,1.024000
-RGB_Gain=0.987000,1.000000,1.007000
-```
-
-Edit these three lines directly in the `.ini`, then reload the preset in the ReShade
-overlay (no restart needed).
+This deepens the cooling and de-golds sand/skin/stone more aggressively while the extra
+green saturation keeps foliage from going dull. Watch skin in shade - if it starts to read
+gray, ease the temperature back toward `-0.12`.
 
 ## Files
 
@@ -148,8 +132,7 @@ overlay (no restart needed).
 ## Credits
 
 - ReShade by crosire - [reshade.me](https://reshade.me/)
-- SweetFX shaders by CeeJay.dk
+- qUINT Lightroom by Marty McFly (Pascal Gilcher)
 - SMAA by Jorge Jimenez et al. (ReShade port by CeeJay.dk, ships with SweetFX)
 - CAS (FidelityFX Contrast Adaptive Sharpening) by AMD (ReShade port by CeeJay.dk)
 - Deband by haasn / crosire
-- Clarity by Ioxa (distributed via AstrayFX by BlueSkyDefender)
