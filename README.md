@@ -1,10 +1,11 @@
-# AC4 Black Flag (Resynced) - Natural Cinematic ReShade Preset
+# Orange Begone - AC4 Black Flag (Resynced) ReShade Preset
 
-A ReShade **6.7.3** preset for Assassin's Creed IV: Black Flag Resynced that removes the
-game's strong baked-in orange/yellow grade and replaces it with a neutral-cinematic look.
-The heavy lifting is done by a single selective color-grading pass (qUINT Lightroom) rather
-than a stack of blunt global adjustments, so the correction is decisive and toggling ReShade
-shows a clear, obvious difference.
+A ReShade **6.7.3** preset for Assassin's Creed IV: Black Flag Resynced that does one thing
+and does it well: it removes the game's strong baked-in orange/yellow grade and leaves a
+clean, neutral image behind. No stylized filter, no "cinematic" gimmicks - just the orange
+gone. The heavy lifting is done by a single selective color-grading pass (qUINT Lightroom)
+rather than a stack of blunt global adjustments, so the correction is decisive and toggling
+ReShade shows a clear, obvious difference.
 
 All parameter names are verified against the actual shader sources
 ([martymcmodding/qUINT](https://github.com/martymcmodding/qUINT),
@@ -98,10 +99,10 @@ face and material depth without Clarity or FakeHDR.
    - **Standard effects** - provides `Deband`
    - **SweetFX by CeeJay.dk** - provides `SMAA` and `CAS`
    - **qUINT by Marty McFly / Pascal Gilcher** - provides `Lightroom` (`qUINT_lightroom.fx`)
-4. Copy `AC4BF_Natural_Cinematic.ini` next to the game executable (or anywhere you like).
+4. Copy `AC4BF_OrangeBegone.ini` next to the game executable (or anywhere you like).
 5. Launch the game, press **Home** to open the ReShade overlay, and select the preset in
-   the preset browser at the top. All four active techniques enable automatically in the
-   correct order.
+   the preset browser at the top (listed as `AC4BF_OrangeBegone`). All four active techniques
+   enable automatically in the correct order.
 
 > [!TIP]
 > If the game's own anti-aliasing option is available, SMAA stacks fine on top of it -
@@ -132,7 +133,7 @@ gray, ease the temperature back toward `-0.12`.
 
 ## Files
 
-- `AC4BF_Natural_Cinematic.ini` - the preset.
+- `AC4BF_OrangeBegone.ini` - the preset.
 - `packaging/INSTALL.txt` - short install guide bundled inside the release zip.
 - `scripts/package.sh` - builds the Nexus-ready zip.
 - `.github/workflows/release.yml` - auto-builds the zip and publishes a GitHub Release on tag push.
@@ -145,7 +146,7 @@ To build the distributable zip locally (output goes to `dist/`, which is git-ign
 ./scripts/package.sh v1.0.0
 ```
 
-This produces `dist/AC4BF-Natural-Cinematic-v1.0.0.zip` containing the `.ini`, this README,
+This produces `dist/AC4BF-OrangeBegone-v1.0.0.zip` containing the `.ini`, this README,
 and `INSTALL.txt` at the top level - ready to upload to Nexus Mods.
 
 To cut a GitHub Release automatically, push a version tag:

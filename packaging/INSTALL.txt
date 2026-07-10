@@ -1,8 +1,9 @@
-AC4 Black Flag (Resynced) - Natural Cinematic ReShade Preset
+Orange Begone - AC4 Black Flag (Resynced) ReShade Preset
 ============================================================
 
-A neutral-cinematic ReShade preset that removes the game's heavy
-orange/yellow cast. Built for ReShade 6.7.3.
+A no-nonsense ReShade preset that removes the game's heavy
+orange/yellow cast and leaves everything else alone. Built for
+ReShade 6.7.3.
 
 Effect chain: SMAA -> Deband -> qUINT Lightroom -> CAS
 
@@ -21,12 +22,12 @@ INSTALLATION
      - SweetFX by CeeJay.dk          (provides SMAA and CAS)
      - qUINT by Marty McFly          (provides Lightroom)
 
-3. Copy AC4BF_Natural_Cinematic.ini next to the game executable
+3. Copy AC4BF_OrangeBegone.ini next to the game executable
    (or into your ReShade preset folder).
 
 4. Launch the game, press HOME to open the ReShade overlay, and
-   select "AC4BF_Natural_Cinematic" from the preset browser at the
-   top. All four techniques enable automatically in the right order.
+   select "AC4BF_OrangeBegone" from the preset browser at the top.
+   All four techniques enable automatically in the right order.
 
 
 NOTES

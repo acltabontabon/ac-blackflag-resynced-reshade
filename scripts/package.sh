@@ -6,8 +6,8 @@
 #   scripts/package.sh [version]
 #
 # Examples:
-#   scripts/package.sh                # -> dist/AC4BF-Natural-Cinematic-dev.zip
-#   scripts/package.sh v1.0.0         # -> dist/AC4BF-Natural-Cinematic-v1.0.0.zip
+#   scripts/package.sh                # -> dist/AC4BF-OrangeBegone-dev.zip
+#   scripts/package.sh v1.0.0         # -> dist/AC4BF-OrangeBegone-v1.0.0.zip
 #
 set -euo pipefail
 
@@ -15,13 +15,13 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 VERSION="${1:-dev}"
-NAME="AC4BF-Natural-Cinematic"
+NAME="AC4BF-OrangeBegone"
 OUT_DIR="dist"
 ZIP_PATH="$(pwd)/${OUT_DIR}/${NAME}-${VERSION}.zip"
 
 # Files that go inside the zip.
 FILES=(
-  "AC4BF_Natural_Cinematic.ini"
+  "AC4BF_OrangeBegone.ini"
   "README.md"
   "packaging/INSTALL.txt"
 )
