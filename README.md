@@ -12,7 +12,7 @@ ReShade 6.x installer, so every value loads exactly as written - no silent fallb
 shader defaults.
 
 Tested on: **Windows 11 · NVIDIA RTX 5070 Ti (16 GB) · AMD Ryzen 7 7800X3D · 32 GB RAM.**
-All nine effects are lightweight screen-space passes (no depth-buffer ray marching), so the
+All ten effects are lightweight screen-space passes (no depth-buffer ray marching), so the
 performance cost is negligible on this class of hardware and should stay small even on
 mid-range GPUs.
 
@@ -29,6 +29,11 @@ detail fourth, finish last:
 
 ### Stage 0 - Cleanup
 
+- **SMAA** - morphological anti-aliasing on the raw frame, before anything downstream can
+  sharpen the jaggies. Uses luma edge detection (no depth buffer required) with the
+  threshold lowered to `0.08` and search steps raised to `48`, so near-horizontal edges -
+  stair treads, ship railings, rigging lines - resolve into smooth gradients instead of
+  staircases.
 - **Deband** - dithers away color banding in smooth gradients (skies, ocean, haze) before
   any later pass can amplify it. Runs at default detection thresholds with a single
   iteration; visually invisible except where banding would have appeared.
@@ -73,14 +78,21 @@ detail fourth, finish last:
 2. Point it at the game's main executable (the one you actually launch to play - not a
    launcher/updater). Let it auto-detect the rendering API.
 3. When the installer asks which effect packages to install, check these three:
-   - **Standard effects** - provides `Deband`
+   - **Standard effects** - provides `SMAA` and `Deband`
    - **SweetFX by CeeJay.dk** - provides `LiftGammaGain`, `Tonemap`, `Curves`, `Vibrance`,
      `LumaSharpen`, `Vignette`, `FilmGrain`
    - **AstrayFX by BlueSkyDefender** - provides `Clarity`
 4. Copy `AC4BF_Natural_Cinematic.ini` next to the game executable (or anywhere you like).
 5. Launch the game, press **Home** to open the ReShade overlay, and select the preset in
-   the preset browser at the top. All nine techniques enable automatically in the correct
+   the preset browser at the top. All ten techniques enable automatically in the correct
    order.
+
+> [!TIP]
+> If the game's own anti-aliasing option is available, SMAA stacks fine on top of it -
+> ReShade's SMAA catches the edges the in-game AA misses (thin railings, rigging). If you
+> see any residual shimmer in motion, that's temporal aliasing, which no injector-level AA
+> can fully fix - prefer the game's TAA/DLSS/FSR option as the base and keep this SMAA pass
+> for the leftover static edges.
 
 ## Files
 
@@ -90,5 +102,6 @@ detail fourth, finish last:
 
 - ReShade by crosire - [reshade.me](https://reshade.me/)
 - SweetFX shaders by CeeJay.dk
+- SMAA by Jorge Jimenez et al. (ReShade port in standard effects)
 - Deband by haasn / crosire
 - Clarity by Ioxa (distributed via AstrayFX by BlueSkyDefender)
