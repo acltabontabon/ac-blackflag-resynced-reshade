@@ -22,7 +22,6 @@ ZIP_PATH="$(pwd)/${OUT_DIR}/${NAME}-${VERSION}.zip"
 # Files that go inside the zip.
 FILES=(
   "AC4BF_OrangeBegone.ini"
-  "README.md"
   "packaging/INSTALL.txt"
 )
 

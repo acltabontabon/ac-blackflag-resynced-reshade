@@ -91,12 +91,11 @@ When the installer asks which effects to install, **check these three:**
 - **SweetFX by CeeJay.dk** → provides `SMAA` and `CAS`
 - **qUINT by Marty McFly** → provides `Lightroom`
 
-### Step 3: Add the Preset
-1. Copy `AC4BF_OrangeBegone.ini` to your game folder (same location as the executable)
-2. Launch the game
-3. Press **Home** to open the ReShade overlay
-4. Select **AC4BF_OrangeBegone** from the preset browser at the top
-5. All four effects enable automatically in the correct order ✓
+### Step 3: Load the Preset
+1. Launch the game
+2. Press **Home** to open the ReShade overlay
+3. Click the preset browser at the top and browse for `AC4BF_OrangeBegone.ini`
+4. All four effects enable automatically in the correct order ✓
 
 ---
 
