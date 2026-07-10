@@ -13,8 +13,8 @@ ReShade 6.x installer, so every value loads exactly as written - no silent fallb
 shader defaults.
 
 Tested on: **Windows 11 · NVIDIA RTX 5070 Ti (16 GB) · AMD Ryzen 7 7800X3D · 32 GB RAM.**
-Ten of the twelve effects are lightweight screen-space passes; MXAO (depth-based ambient
-occlusion) and qUINT Bloom are the heavier two, but at these settings the total cost stays
+Eleven of the twelve effects are lightweight screen-space passes; MXAO (depth-based
+ambient occlusion) is the heavier one, but at these settings the total cost stays
 comfortably small on this class of hardware. On mid-range GPUs, drop
 `MXAO_GLOBAL_SAMPLE_QUALITY_PRESET` to `2` and/or `MXAO_GLOBAL_RENDER_SCALE` to `0.75`
 before touching anything else.
@@ -48,13 +48,14 @@ detail fourth, finish last:
   baked AO misses - under ledges, between planks, where props meet the ground - so flat
   scenes gain real depth. Amount is kept at `0.70` (below neutral) because it stacks on top
   of the game's own AO; a depth fade-out at `0.4` keeps distant haze and sky untouched.
-- **qUINT Bloom** - multi-layer adaptive bloom. The curve is pushed high (`7.0`) so only
-  genuine highlights bloom - sun glints, lanterns, bright plaster - rather than hazing the
-  whole frame, and bloom saturation is reduced so it can't re-warm what Stage 1 removes.
-  Scene adaptation gives a gentle, natural auto-exposure when moving between interiors and
-  Caribbean daylight.
 
-Both run **before** the color grade, so the de-yellowing pass tames their output too.
+It runs **before** the color grade, so the de-yellowing pass tames its output too.
+
+> [!NOTE]
+> Bloom is deliberately **not** part of this preset. Injector-level bloom shaders bring
+> their own auto-exposure, which fights the game's built-in eye adaptation - the result is
+> a darkened image and visible exposure flicker. The remake's native bloom is already good;
+> leave it to the game.
 
 ### Stage 1 - Base color correction (the de-yellowing)
 
@@ -70,6 +71,11 @@ Both run **before** the color grade, so the de-yellowing pass tames their output
 
 - **Curves** - a gentle S-curve (`0.12` contrast) applied to **luma only**, so the added
   contrast never pumps saturation back up.
+- **FakeHDR** - static local dynamic-range expansion: shadows get deeper, highlights get
+  brighter, midtone detail gains "pop". Unlike bloom-style shaders it has **no exposure or
+  adaptation logic** - the same pixel always maps the same way - so it cannot pump or
+  flicker. Power is kept at `1.15` (below the `1.30` default) since Curves already carries
+  global contrast.
 - **Vibrance** - selective saturation (`0.10`) with the RGB balance weighted away from red
   (`0.70`) and toward blue (`1.25`): ocean and jungle read rich again without re-warming
   skin tones, sand, and stone.
@@ -79,8 +85,11 @@ Both run **before** the color grade, so the de-yellowing pass tames their output
 - **Clarity** - local contrast at moderate strength (`0.25`), blend-masked so deep shadows
   and near-white highlights are excluded. This adds the "crisp midtone detail" look without
   halos or the HDR-photo effect.
-- **LumaSharpen** - classic luma-only sharpening (`0.55` strength, clamped at `0.035`) for
-  edge definition on rigging, foliage, and architecture without ringing artifacts.
+- **CAS (AMD FidelityFX Contrast Adaptive Sharpening)** - the adaptive successor to
+  classic sharpening: it sharpens soft, low-contrast areas strongly and automatically backs
+  off where contrast is already high, so it never rings or halos - and never re-jags the
+  edges SMAA smoothed in Stage 0. Full strength (`1.0`) is safe precisely because of that
+  adaptivity.
 
 ### Stage 4 - Cinematic finish
 
@@ -96,11 +105,11 @@ Both run **before** the color grade, so the de-yellowing pass tames their output
 2. Point it at the game's main executable (the one you actually launch to play - not a
    launcher/updater). Let it auto-detect the rendering API.
 3. When the installer asks which effect packages to install, check these four:
-   - **Standard effects** - provides `SMAA` and `Deband`
-   - **SweetFX by CeeJay.dk** - provides `LiftGammaGain`, `Tonemap`, `Curves`, `Vibrance`,
-     `LumaSharpen`, `Vignette`, `FilmGrain`
+   - **Standard effects** - provides `Deband` (and `DisplayDepth` for the depth check below)
+   - **SweetFX by CeeJay.dk** - provides `SMAA`, `LiftGammaGain`, `Tonemap`, `Curves`,
+     `FakeHDR`, `Vibrance`, `CAS`, `Vignette`, `FilmGrain`
    - **AstrayFX by BlueSkyDefender** - provides `Clarity`
-   - **qUINT by Marty McFly** - provides `MXAO` and `Bloom`
+   - **qUINT by Marty McFly** - provides `MXAO`
 4. Copy `AC4BF_Natural_Cinematic.ini` next to the game executable (or anywhere you like).
 5. Launch the game, press **Home** to open the ReShade overlay, and select the preset in
    the preset browser at the top. All twelve techniques enable automatically in the correct
@@ -134,7 +143,8 @@ MXAO is the one effect here that needs the game's **depth buffer**. Verify it on
 
 - ReShade by crosire - [reshade.me](https://reshade.me/)
 - SweetFX shaders by CeeJay.dk
-- SMAA by Jorge Jimenez et al. (ReShade port in standard effects)
-- MXAO and qUINT Bloom by Marty McFly (Pascal Gilcher) - [qUINT](https://github.com/martymcmodding/qUINT)
+- SMAA by Jorge Jimenez et al. (ReShade port by CeeJay.dk, ships with SweetFX)
+- CAS (FidelityFX Contrast Adaptive Sharpening) by AMD (ReShade port by CeeJay.dk)
+- MXAO by Marty McFly (Pascal Gilcher) - [qUINT](https://github.com/martymcmodding/qUINT)
 - Deband by haasn / crosire
 - Clarity by Ioxa (distributed via AstrayFX by BlueSkyDefender)
