@@ -1,170 +1,121 @@
-# Orange Begone - AC4 Black Flag (Resynced) ReShade Preset
+# 🎮 Orange Begone – AC4 Black Flag ReShade Preset
 
-A ReShade **6.7.3** preset for Assassin's Creed IV: Black Flag Resynced that does one thing
-and does it well: it removes the game's strong baked-in orange/yellow grade and leaves a
-clean, neutral image behind. No stylized filter, no "cinematic" gimmicks - just the orange
-gone. The heavy lifting is done by a single selective color-grading pass (qUINT Lightroom)
-rather than a stack of blunt global adjustments, so the correction is decisive and toggling
-ReShade shows a clear, obvious difference.
+**Tired of that overwhelming orange cast?** This ReShade preset does one thing and does it beautifully: **removes the baked-in orange/yellow filter** and reveals a clean, neutral image underneath.
 
-All parameter names are verified against the actual shader sources
-([martymcmodding/qUINT](https://github.com/martymcmodding/qUINT),
-[CeeJayDK/SweetFX](https://github.com/CeeJayDK/SweetFX),
-[crosire/reshade-shaders](https://github.com/crosire/reshade-shaders)) as shipped by the
-ReShade 6.x installer, so every value loads exactly as written - no silent fallbacks to
-shader defaults.
+> No stylized filters. No "cinematic" gimmicks. Just the orange gone. ✨
 
-Tested on: **Windows 11 · NVIDIA RTX 5070 Ti (16 GB) · AMD Ryzen 7 7800X3D · 32 GB RAM.**
-All four active effects are lightweight screen-space passes (no depth-buffer ray marching),
-so the performance cost is negligible on this class of hardware and should stay small even
-on mid-range GPUs.
+---
 
-## Screenshots
+## What You Get
 
-| Before                   | After              |
-|--------------------------|--------------------|
-| _vanilla (orange grade)_ | _preset applied_   |
+✅ **Smart color grading** – uses a single selective pass instead of blunt global adjustments  
+✅ **Obvious difference** – toggle ReShade on/off and see the transformation instantly  
+✅ **Lightweight** – negligible performance cost even on mid-range GPUs  
+✅ **Verified precision** – every parameter is checked against actual shader sources  
 
-## What the preset does
+---
 
-Four passes, in this exact order - clean up, grade, sharpen:
+## 📸 Before & After
+
+| Before | After |
+|:---:|:---:|
+| 🟠 Vanilla (orange grade) | ✨ Preset applied |
+
+---
+
+## 🛠 How It Works
+
+The preset uses **4 passes** working in sequence:
 
 ```
-SMAA  ->  Deband  ->  Lightroom  ->  CAS
+SMAA  →  Deband  →  Lightroom  →  CAS
 ```
 
-### Stage 0 - Cleanup
+### 1️⃣ **Cleanup Stage**
 
-- **SMAA** - morphological anti-aliasing on the raw frame, before anything downstream can
-  sharpen the jaggies. Uses luma edge detection (no depth buffer required) at threshold
-  `0.10` with `32` search steps.
-- **Deband** - dithers away color banding in smooth gradients (skies, ocean, haze) before
-  the grade can amplify it. Runs at default detection thresholds with a single iteration;
-  visually invisible except where banding would have appeared.
+**SMAA** *(Morphological Anti-Aliasing)*
+- Smooths jagged edges before sharpening makes them worse
+- Edge detection: luma-based (no depth buffer needed)
+- Settings: threshold `0.10`, 32 search steps
 
-### Stage 1 - Grade (qUINT Lightroom)
+**Deband**
+- Removes color banding in smooth gradients (skies, ocean, water)
+- Runs at default thresholds with one pass
+- Visually invisible—only shows up where banding would have appeared
 
-A single static color-grading pass replaces the old LiftGammaGain + Tonemap + Curves +
-Vibrance stack. One shader now handles white balance, exposure/tone shaping, and per-band
-(HSL) selective color, so no two passes fight over the same operation. Lightroom is
-LUT-based and must run before sharpening, hence its position here.
+### 2️⃣ **Color Grade** (qUINT Lightroom)
 
-**How the orange/yellow is selectively reduced:**
+This is where the magic happens. A single selective color-grading pass replaces multiple competing filters:
 
-- **Cooler white balance** - global temperature `-0.08` shifts the whole frame off the
-  warm cast (toward blue ~202°). Enough to keep the image neutral and anti-orange without
-  tipping cold or gray.
-- **Orange & yellow saturation pulled down** - orange `-0.18`, yellow `-0.18`, so skin,
-  sand, pale stone, blonde/brown hair, and cream fabric don't read gold. Orange is eased so
-  shaded faces don't look pale; yellow is held a touch stronger to clear remaining gold in
-  sand and painted walls. Red is only lightly trimmed (`-0.04`) so Edward's coat stays rich.
-- **Warm-highlight luminance** - orange exposure `-0.01`, yellow exposure `-0.05`. Orange is
-  near neutral so shaded skin regains natural brightness through luminance, not saturation;
-  yellow stays trimmed so bright beige surfaces stay controlled - no orange returns.
-- **Hue nudges** - yellow shifted slightly toward green (`+0.06`) so blondes read blonde,
-  not gold; orange shifted toward red/peach (`-0.05`) so skin reads natural peach.
-- **Foliage & sky** - green saturation `+0.08` keeps vegetation natural green; blue
-  saturation `+0.05` keeps the sky clean blue. Aqua stays neutral (`0`) so nothing turns
-  turquoise and clouds stay neutral white. A gentle global vibrance (`+0.025`) lifts
-  low-saturation colors back without pumping the whole image.
-- **Green/cyan cast fix** - a very small tint `-0.005` (toward magenta) keeps shadows and
-  neutral architecture neutral without any pink/gray influence.
+**How the orange/yellow gets removed:**
+- **Cooler white balance** – shifts the whole frame slightly toward blue to neutralize the warm cast
+- **Orange & yellow pulled back** – reduces saturation so skin, sand, and stone look natural instead of golden
+- **Hue nudges** – yellows shift toward green (so blondes stay blonde), oranges shift toward red (so skin looks natural)
+- **Smart saturation** – greens and blues stay vibrant so foliage and skies look fresh and clean
+- **Tone adjustments** – highlights are controlled so bright surfaces don't blow out, shadows stay visible
+- **Vibrance** – lifts muted colors without oversaturating everything
 
-**Tone:** global exposure is neutral (`0`); highlights curve `-0.19` and whites curve `-0.05`
-keep warm highlights in range while leaving sunlight and sand their tropical energy and
-texture; shadows are raised slightly (`+0.03`), blacks left at `0` to preserve depth without
-crushing dark interiors, and a small midtone lift (`+0.02`) plus `+0.10` contrast restore
-face and material depth without Clarity or FakeHDR.
+💡 **Result:** Edward looks like Edward, the Caribbean looks tropical, and nothing looks filtered.
 
-### Stage 2 - Sharpening
+### 3️⃣ **Sharpening** (CAS)
 
-- **CAS (AMD FidelityFX Contrast Adaptive Sharpening)** - sharpens soft, low-contrast areas
-  and backs off where contrast is already high, so it's less prone to ringing than uniform
-  sharpening. Runs after the grade at `0.30` - crisp detail on faces and sails at 1080p
-  without a visible "sharpened" edge.
+**CAS** *(Contrast Adaptive Sharpening by AMD)*
+- Sharpens soft details on faces and sails
+- Backs off where contrast is already high (no halos or weird artifacts)
+- Crisp detail at `0.30` intensity without that "over-sharpened" look
 
-> [!NOTE]
-> This preset uses only static, depth-independent passes. Earlier revisions tried Bloom and
-> MXAO (depth-based ambient occlusion) and removed both: Bloom's auto-exposure fought the
-> game's built-in eye adaptation (darkened image, exposure flicker) and MXAO shimmered on
-> this remake's unstable depth buffer. FakeHDR, Defog, LUTs, and film grain are intentionally
-> not used - the goal is a clean neutral grade, not a stylized layer over the top.
+---
 
-## Install
+## ⚡ Performance
 
-1. Download ReShade **6.7.3** from [reshade.me](https://reshade.me/) and run the installer.
-2. Point it at the game's main executable (the one you actually launch to play - not a
-   launcher/updater). Let it auto-detect the rendering API.
-3. When the installer asks which effect packages to install, check these three:
-   - **Standard effects** - provides `Deband`
-   - **SweetFX by CeeJay.dk** - provides `SMAA` and `CAS`
-   - **qUINT by Marty McFly / Pascal Gilcher** - provides `Lightroom` (`qUINT_lightroom.fx`)
-4. Copy `AC4BF_OrangeBegone.ini` next to the game executable (or anywhere you like).
-5. Launch the game, press **Home** to open the ReShade overlay, and select the preset in
-   the preset browser at the top (listed as `AC4BF_OrangeBegone`). All four active techniques
-   enable automatically in the correct order.
+| Metric | Details |
+|--------|---------|
+| **Resolution** | Tested at 1080p+ |
+| **GPU** | NVIDIA RTX 5070 Ti (tested) |
+| **CPU** | AMD Ryzen 7 7800X3D (tested) |
+| **RAM** | 32 GB (tested) |
+| **Impact** | Negligible – all passes are lightweight screen-space effects (no ray marching) |
 
-> [!TIP]
-> If the game's own anti-aliasing option is available, SMAA stacks fine on top of it -
-> ReShade's SMAA catches the edges the in-game AA misses (thin railings, rigging). If you
-> see any residual shimmer in motion, that's temporal aliasing, which no injector-level AA
-> can fully fix - prefer the game's TAA/DLSS/FSR option as the base and keep this SMAA pass
-> for the leftover static edges.
+---
 
-## Stronger anti-orange variant
+## 🚀 Installation
 
-If direct-sun scenes are still too warm for your taste, push the same Lightroom controls
-further. Change only these lines in the `[qUINT_lightroom.fx]` section, then reload the
-preset in the overlay (no restart needed):
+### Step 1: Install ReShade
+1. Download **ReShade 6.7.3** from [reshade.me](https://reshade.me/)
+2. Run the installer and point it at your game executable (the one you actually launch to play)
+3. Let it auto-detect your rendering API
 
-```ini
-[qUINT_lightroom.fx]
-LIGHTROOM_ORANGE_SATURATION=-0.400000
-LIGHTROOM_YELLOW_SATURATION=-0.280000
-LIGHTROOM_ORANGE_EXPOSURE=-0.200000
-LIGHTROOM_YELLOW_EXPOSURE=-0.150000
-LIGHTROOM_GLOBAL_TEMPERATURE=-0.140000
-LIGHTROOM_GREEN_SATURATION=0.120000
-```
+### Step 2: Install Effect Packages
+When the installer asks which effects to install, **check these three:**
+- **Standard effects** → provides `Deband`
+- **SweetFX by CeeJay.dk** → provides `SMAA` and `CAS`
+- **qUINT by Marty McFly** → provides `Lightroom`
 
-This deepens the cooling and de-golds sand/skin/stone more aggressively while the extra
-green saturation keeps foliage from going dull. Watch skin in shade - if it starts to read
-gray, ease the temperature back toward `-0.12`.
+### Step 3: Add the Preset
+1. Copy `AC4BF_OrangeBegone.ini` to your game folder (same location as the executable)
+2. Launch the game
+3. Press **Home** to open the ReShade overlay
+4. Select **AC4BF_OrangeBegone** from the preset browser at the top
+5. All four effects enable automatically in the correct order ✓
 
-## Files
+---
 
-- `AC4BF_OrangeBegone.ini` - the preset.
-- `packaging/INSTALL.txt` - short install guide bundled inside the release zip.
-- `scripts/package.sh` - builds the Nexus-ready zip.
-- `.github/workflows/release.yml` - auto-builds the zip and publishes a GitHub Release on tag push.
+## 🎓 Technical Notes
 
-## Building a release
+> This preset uses **only static, depth-independent passes**. Earlier versions tried Bloom and MXAO (ambient occlusion) and removed both:
+> - **Bloom** fought the game's built-in eye adaptation (caused darkening and exposure flicker)
+> - **MXAO** shimmered on this remake's unstable depth buffer
+>
+> FakeHDR, Defog, LUTs, and film grain are intentionally excluded—the goal is a clean neutral grade, not a stylized layer on top.
 
-To build the distributable zip locally (output goes to `dist/`, which is git-ignored):
+**Parameter verification:** All shader parameters are verified against the actual shader sources to ensure they load exactly as written with no silent fallbacks to defaults.
 
-```sh
-./scripts/package.sh v1.0.0
-```
+---
 
-This produces `dist/AC4BF-OrangeBegone-v1.0.0.zip` containing the `.ini`, this README,
-and `INSTALL.txt` at the top level - ready to upload to Nexus Mods.
+## 🙏 Credits
 
-To cut a GitHub Release automatically, push a version tag:
-
-```sh
-git tag v1.0.0
-git push origin v1.0.0
-```
-
-The `Release` workflow builds the same zip and attaches it to a new GitHub Release. Download
-that zip and upload it to Nexus, or link the release page. You can also trigger the workflow
-manually from the Actions tab for a dry run (builds the zip as a downloadable artifact without
-creating a release).
-
-## Credits
-
-- ReShade by crosire - [reshade.me](https://reshade.me/)
-- qUINT Lightroom by Marty McFly (Pascal Gilcher)
-- SMAA by Jorge Jimenez et al. (ReShade port by CeeJay.dk, ships with SweetFX)
-- CAS (FidelityFX Contrast Adaptive Sharpening) by AMD (ReShade port by CeeJay.dk)
-- Deband by haasn / crosire
+- **ReShade** – [crosire](https://github.com/crosire/reshade-shaders) • [reshade.me](https://reshade.me/)
+- **qUINT Lightroom** – Marty McFly (Pascal Gilcher)
+- **SMAA** – Jorge Jimenez et al. (ReShade port by CeeJay.dk, ships with SweetFX)
+- **CAS** – AMD FidelityFX (ReShade port by CeeJay.dk)
+- **Deband** – haasn / crosire
