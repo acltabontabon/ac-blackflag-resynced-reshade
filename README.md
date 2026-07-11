@@ -158,11 +158,11 @@ Load it exactly like the base preset — pick it in the ReShade preset browser.
 
 ## 🎓 Technical Notes
 
-> This preset uses **only static, depth-independent passes**. Earlier versions tried Bloom and MXAO (ambient occlusion) and removed both:
-> - **Bloom** fought the game's built-in eye adaptation (caused darkening and exposure flicker)
-> - **MXAO** shimmered on this remake's unstable depth buffer
+> This preset uses **only static, depth-independent passes** — it grades the image; it does not touch lighting or geometry.
 >
-> FakeHDR, Defog, LUTs, and film grain are intentionally excluded—the goal is a clean neutral grade, not a stylized layer on top.
+> **Why no ambient occlusion / ray-traced GI (MXAO, RTGI)?** The Resynced remake runs on the modern Anvil engine and already ships **native ray-traced global illumination, reflections, and SSAO** (see the in-game *Ray Tracing Mode* and *Screen Space Effects*). Layering ReShade's screen-space AO/GI on top of native ray tracing is redundant and looks worse — it double-darkens and fights the engine's integrated lighting. The Anvil depth buffer is also fragile for ReShade: it drops out on dialogue/cutscene camera cuts and shimmers under TAA/DLAA. **For GI/AO/reflection fidelity, use the game's own Ray Tracing Mode (Extended) — not a ReShade shader.** This preset stays a clean color + sharpen layer on top.
+>
+> **Bloom** was also tried and removed — it fought the game's built-in eye adaptation (darkening and exposure flicker). FakeHDR, Defog, LUTs, and film grain are intentionally excluded — the goal is a clean neutral grade, not a stylized layer on top.
 
 **Parameter verification:** All shader parameters are verified against the actual shader sources to ensure they load exactly as written with no silent fallbacks to defaults.
 
