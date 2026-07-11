@@ -140,13 +140,7 @@ Using **DLAA, DLSS, or TAA**? The download also includes **`AC4BF_OrangeBegone_D
 - **CAS raised to `0.40`** – recovers the slight softness DLAA/DLSS leaves behind
 - **Orange band tuned for skin** and a **gentler `-0.05` white balance**
 
-Load it exactly like the base preset — pick it in the ReShade preset browser.
-
-**Havana street**
-![DLAA street before/after](docs/images/dlaa/street.jpg)
-
-**Encounter**
-![DLAA encounter before/after](docs/images/dlaa/encounter.jpg)
+Load it exactly like the base preset — pick it in the ReShade preset browser. The DLAA shots in the [interactive comparison](https://acltabontabon.com/ac-blackflag-resynced-reshade/compare/) are all captured with this variant.
 
 ---
 
