@@ -2,6 +2,28 @@
 
 All notable changes to Orange Begone preset are documented here.
 
+## [1.1.1] – 2026-07-11
+
+DLAA variant only. The base preset is unchanged.
+
+### Changed
+- **DLAA variant:** CAS `Contrast` raised to 0.12 (was 0.00). Biases sharpening toward
+  the low-contrast texture DLAA actually leaves soft, instead of pushing harder on edges
+  that are already clean. Prefer raising this over raising `Sharpening`.
+- **DLAA variant:** Deband `t1` lowered to 0.005 (was 0.007). DLAA's temporal jitter
+  already acts as mild dithering, so Deband can smooth less aggressively and preserve
+  more fine detail. Revert to 0.007 if banding reappears in night skies.
+
+Both changes are spatial-only and do not touch hue, saturation, or white balance — the
+orange fix is unaffected. `ORANGE_SATURATION` deliberately stays at -0.22.
+
+### Added
+- **DLAA variant:** documented the NVIDIA driver settings the preset assumes — leave the
+  DLSS Override dialogs at their defaults and select DLAA in-game; keep frame generation
+  and Smooth Motion off (they interpolate *after* ReShade runs); don't stack DSR with
+  DLAA; and keep **RTX Dynamic Vibrance off**, as it re-saturates after the grade and is
+  the one driver setting that will actively undo the preset.
+
 ## [1.1.0] – 2026-07-11
 
 ### Added
