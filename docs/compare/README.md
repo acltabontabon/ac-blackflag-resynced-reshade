@@ -3,25 +3,34 @@
 A self-contained drag-to-compare page (`index.html`) for the Orange Begone preset.
 No build step, no dependencies — just static HTML/CSS/JS.
 
-## Add a scene
+## How scenes display
 
-Each scene needs **two full-frame screenshots of the same spot** — one with ReShade
-off, one with it on:
+Each scene tries three things, in order:
 
-1. In-game, frame a shot and stand still.
+1. **Interactive wipe** — if a matched pair `images/<id>-before.jpg` + `images/<id>-after.jpg`
+   exists, the scene becomes a drag-to-compare slider.
+2. **Static split** — otherwise it falls back to the existing before/after composite
+   in `../images/base/<id>.jpg` (already shipped), shown as a static image.
+3. **Placeholder** — only if neither exists.
+
+So every scene shows real content out of the box (the static composites); adding a
+matched pair upgrades that scene to the interactive wipe.
+
+## Upgrade a scene to the interactive wipe
+
+Capture **two full-frame screenshots of the same spot** — one ReShade off, one on:
+
+1. Frame a shot and stand still.
 2. Press the ReShade **screenshot** key (default `PrtScn`) with the preset **off**,
-   then toggle the preset **on** (default `Home` → toggle, or your effects-toggle key)
-   and press screenshot again. Don't move between the two.
-3. Rename the pair and drop them in `images/`:
-   - `images/havana-before.jpg` + `images/havana-after.jpg`
-   - `images/harbor-before.jpg`  + `images/harbor-after.jpg`
-   - `images/encounter-before.jpg` + `images/encounter-after.jpg`
+   toggle the preset **on**, then screenshot again. Don't move between the two.
+3. Drop the pair in `images/`, named by scene id:
+   - `images/havana-rooftops-before.jpg` + `images/havana-rooftops-after.jpg`
+   - `images/harbor-before.jpg` + `images/harbor-after.jpg`
+   - `images/town-square-before.jpg` + `images/town-square-after.jpg`
+   - `images/faces-before.jpg` + `images/faces-after.jpg`
 
-The page already lists those three scenes. Until the files exist, each shows a
-placeholder telling you exactly which filenames to drop in. To add more scenes,
-edit the `SCENES` array near the bottom of `index.html`.
-
-JPG keeps the repo light; PNG works too (update the paths in `SCENES`).
+To add or rename scenes, edit the `SCENES` array near the bottom of `index.html`.
+JPG keeps the repo light; PNG works too.
 
 ## Publish it (GitHub Pages)
 

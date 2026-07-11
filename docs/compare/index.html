@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Orange Begone — Interactive Comparison</title>
-<meta name="description" content="Drag-to-compare before/after for the Orange Begone ReShade preset (AC4 Black Flag Resynced)." />
+<meta name="description" content="Before/after for the Orange Begone ReShade preset (AC4 Black Flag Resynced)." />
 <style>
   :root{
     --bg:#0e1114; --panel:#161b20; --line:#2a333c; --text:#eef2f5; --muted:#9fb0bd;
@@ -25,7 +25,7 @@
   .tab{
     background:var(--panel); color:var(--text); border:1px solid var(--line);
     border-radius:999px; padding:7px 15px; font-size:14px; cursor:pointer;
-    transition:border-color .15s, background .15s;
+    transition:border-color .15s, color .15s;
   }
   .tab:hover{border-color:#3d4a55}
   .tab[aria-selected="true"]{border-color:var(--accent); color:var(--accent)}
@@ -34,34 +34,27 @@
     border:1px solid var(--line); border-radius:var(--radius); overflow:hidden;
     cursor:ew-resize; user-select:none; touch-action:none;
   }
+  .stage.static{cursor:default}
+  .stage.static .divider,.stage.static .knob,.stage.static .tag,.stage.static .hint{display:none}
   .stage:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
   .layer{position:absolute; inset:0}
-  .layer img, .layer svg{width:100%; height:100%; object-fit:cover; display:block}
-  #before{clip-path:inset(0 50% 0 0 )}
+  .layer img{width:100%; height:100%; object-fit:cover; display:block}
+  #before{clip-path:inset(0 50% 0 0)}
   .divider{position:absolute; top:0; bottom:0; left:50%; width:2px; background:#fff; box-shadow:0 0 0 1px rgba(0,0,0,.35)}
   .knob{
     position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
     width:38px; height:38px; border-radius:50%; background:#fff; color:#111;
     display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 1px rgba(0,0,0,.35)
   }
-  .tag{
-    position:absolute; top:12px; font-size:12px; font-weight:600; letter-spacing:.05em;
-    color:#fff; background:rgba(0,0,0,.5); padding:4px 9px; border-radius:8px
-  }
+  .tag{position:absolute; top:12px; font-size:12px; font-weight:600; letter-spacing:.05em; color:#fff; background:rgba(0,0,0,.5); padding:4px 9px; border-radius:8px}
   .tag.l{left:12px} .tag.r{right:12px}
-  .hint{
-    position:absolute; bottom:12px; left:50%; transform:translateX(-50%);
-    font-size:12px; color:#fff; background:rgba(0,0,0,.45); padding:4px 11px; border-radius:999px
-  }
-  .placeholder{
-    position:absolute; inset:0; display:none; flex-direction:column; gap:8px;
-    align-items:center; justify-content:center; text-align:center; padding:24px;
-    background:var(--panel); border-radius:var(--radius);
-  }
+  .hint{position:absolute; bottom:12px; left:50%; transform:translateX(-50%); font-size:12px; color:#fff; background:rgba(0,0,0,.45); padding:4px 11px; border-radius:999px}
+  .placeholder{position:absolute; inset:0; display:none; flex-direction:column; gap:8px; align-items:center; justify-content:center; text-align:center; padding:24px; background:var(--panel); border-radius:var(--radius)}
   .placeholder.show{display:flex}
   .placeholder code{background:#0c0f12; border:1px solid var(--line); padding:2px 7px; border-radius:6px; font-size:13px}
   .placeholder .muted{color:var(--muted); font-size:14px; max-width:460px}
-  footer{margin-top:26px; color:var(--muted); font-size:13px}
+  .cap{color:var(--muted); font-size:13px; margin:10px 2px 0; min-height:18px}
+  footer{margin-top:22px; color:var(--muted); font-size:13px}
   footer a{color:var(--accent); text-decoration:none}
   @media (prefers-color-scheme: light){
     :root{--bg:#f4f6f8; --panel:#fff; --line:#dde3e8; --text:#16202a; --muted:#5b6b78}
@@ -72,7 +65,7 @@
 <div class="wrap">
   <header>
     <h1>Orange Begone — before / after</h1>
-    <p class="sub">A ReShade preset that removes the orange cast from Assassin's Creed IV: Black Flag Resynced. Drag the handle to compare.</p>
+    <p class="sub">A ReShade preset that removes the orange cast from Assassin's Creed IV: Black Flag Resynced.</p>
   </header>
 
   <div class="tabs" id="tabs" role="tablist" aria-label="Scenes"></div>
@@ -84,14 +77,15 @@
     <div class="knob" id="knob" aria-hidden="true">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 7 3 12 8 17"/><polyline points="16 7 21 12 16 17"/></svg>
     </div>
-    <span class="tag l" id="tagL">BEFORE · vanilla</span>
-    <span class="tag r" id="tagR">AFTER · preset</span>
+    <span class="tag l">BEFORE · vanilla</span>
+    <span class="tag r">AFTER · preset</span>
     <span class="hint">drag to compare</span>
     <div class="placeholder" id="ph">
-      <strong id="phTitle">Add this scene's screenshots</strong>
-      <p class="muted">Drop <code id="phBefore"></code> and <code id="phAfter"></code> into <code>docs/compare/images/</code>. Capture each pair from the same spot — ReShade off, then on.</p>
+      <strong>Add this scene's screenshots</strong>
+      <p class="muted">Drop <code id="phBefore"></code> and <code id="phAfter"></code> into <code>docs/compare/images/</code> — captured from the same spot, ReShade off then on.</p>
     </div>
   </div>
+  <p class="cap" id="cap"></p>
 
   <footer>
     Built with the <a href="https://reshade.me/">ReShade</a> preset. &nbsp;·&nbsp;
@@ -101,31 +95,18 @@
 
 <script>
 (function(){
-  var DEMO_SVG='<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">'
-    +'<rect width="320" height="180" fill="#bfe0f0"/>'
-    +'<circle cx="248" cy="42" r="20" fill="#fbefce"/><circle cx="248" cy="42" r="34" fill="#fbefce" opacity="0.28"/>'
-    +'<ellipse cx="70" cy="46" rx="34" ry="11" fill="#fff" opacity="0.7"/><ellipse cx="150" cy="34" rx="26" ry="9" fill="#fff" opacity="0.6"/>'
-    +'<rect y="112" width="320" height="68" fill="#4f95bb"/><rect y="112" width="320" height="10" fill="#7fb8d6"/>'
-    +'<path d="M0 112 Q80 100 160 110 T320 108 L320 112 Z" fill="#8aa79a"/>'
-    +'<rect x="212" y="86" width="30" height="26" fill="#cbb891"/><rect x="244" y="94" width="22" height="18" fill="#bfa87e"/><rect x="268" y="90" width="26" height="22" fill="#c8b487"/>'
-    +'<polygon points="212,86 227,74 242,86" fill="#9a6b4f"/><polygon points="268,90 281,80 294,90" fill="#9a6b4f"/>'
-    +'<rect x="34" y="70" width="5" height="44" fill="#7a5a3a"/>'
-    +'<path d="M36 72 q-22 -10 -30 -2 q18 -2 30 6 q12 -16 2 -26 q0 14 -2 22 q14 -8 28 -4 q-18 0 -26 8 Z" fill="#4b7a4a"/>'
-    +'<path d="M104 132 l30 0 l-6 10 l-18 0 Z" fill="#3a4a52"/><rect x="118" y="112" width="2" height="20" fill="#3a4a52"/>'
-    +'<path d="M120 114 l16 4 l-16 6 Z" fill="#e8e2d3"/><path d="M120 116 l-14 3 l14 5 Z" fill="#d8d1c0"/></svg>';
-
   var SCENES=[
-    {id:'demo', label:'Demo (sample)', kind:'demo'},
-    {id:'havana', label:'Havana street', kind:'img', before:'images/havana-before.jpg', after:'images/havana-after.jpg'},
-    {id:'harbor', label:'Harbor', kind:'img', before:'images/harbor-before.jpg', after:'images/harbor-after.jpg'},
-    {id:'encounter', label:'Encounter', kind:'img', before:'images/encounter-before.jpg', after:'images/encounter-after.jpg'}
+    {id:'havana-rooftops', label:'Havana rooftops', composite:'../images/base/havana-rooftops.jpg'},
+    {id:'harbor',          label:'Harbor',          composite:'../images/base/harbor.jpg'},
+    {id:'town-square',     label:'Town square',     composite:'../images/base/town-square.jpg'},
+    {id:'faces',           label:'Faces',           composite:'../images/base/faces.jpg'}
   ];
 
   var afterEl=document.getElementById('after'), beforeEl=document.getElementById('before');
   var stage=document.getElementById('stage'), divider=document.getElementById('divider'), knob=document.getElementById('knob');
   var ph=document.getElementById('ph'), phBefore=document.getElementById('phBefore'), phAfter=document.getElementById('phAfter');
-  var tabsEl=document.getElementById('tabs');
-  var pos=50;
+  var cap=document.getElementById('cap'), tabsEl=document.getElementById('tabs');
+  var mode='static', pos=50;
 
   function setPos(p){
     pos=Math.max(0,Math.min(100,p));
@@ -134,25 +115,41 @@
     stage.setAttribute('aria-valuenow', Math.round(pos));
   }
 
-  function showPlaceholder(sc){
-    phBefore.textContent=sc.before.split('/').pop();
-    phAfter.textContent=sc.after.split('/').pop();
+  function img(src,alt){var i=new Image();i.alt=alt||'';i.src=src;return i;}
+
+  function renderWipe(a,b){
+    mode='wipe'; stage.classList.remove('static');
+    afterEl.innerHTML=''; afterEl.appendChild(a);
+    beforeEl.innerHTML=''; beforeEl.appendChild(b);
+    cap.textContent=''; setPos(50);
+  }
+  function renderStatic(im){
+    mode='static'; stage.classList.add('static');
+    afterEl.innerHTML=''; afterEl.appendChild(im); beforeEl.innerHTML='';
+    cap.textContent='Static split (left = vanilla, right = preset). Drag-to-compare unlocks once matched off/on frames are added.';
+  }
+  function renderPlaceholder(sc){
+    mode='empty'; stage.classList.add('static'); cap.textContent='';
+    afterEl.innerHTML=''; beforeEl.innerHTML='';
+    phBefore.textContent=sc.id+'-before.jpg'; phAfter.textContent=sc.id+'-after.jpg';
     ph.classList.add('show');
   }
 
   function load(sc){
     ph.classList.remove('show');
-    beforeEl.style.filter='none';
-    if(sc.kind==='demo'){
-      afterEl.innerHTML=DEMO_SVG; beforeEl.innerHTML=DEMO_SVG;
-      beforeEl.style.filter='sepia(0.55) saturate(1.7) hue-rotate(-16deg) brightness(1.04) contrast(0.98)';
-      setPos(50); return;
-    }
+    var beforeSrc='images/'+sc.id+'-before.jpg', afterSrc='images/'+sc.id+'-after.jpg';
     var a=new Image(), b=new Image(), pending=2, failed=false;
-    function done(){ if(--pending===0 && !failed){ afterEl.innerHTML=''; afterEl.appendChild(a); beforeEl.innerHTML=''; beforeEl.appendChild(b); setPos(50); } }
-    function fail(){ failed=true; afterEl.innerHTML=''; beforeEl.innerHTML=''; showPlaceholder(sc); }
-    a.onload=done; b.onload=done; a.onerror=fail; b.onerror=fail;
-    a.alt='after'; b.alt='before'; a.src=sc.after; b.src=sc.before;
+    function ready(){ if(--pending===0 && !failed) renderWipe(a,b); }
+    function fallback(){ if(failed) return; failed=true; staticOrPlaceholder(sc); }
+    a.onload=ready; b.onload=ready; a.onerror=fallback; b.onerror=fallback;
+    a.alt='after'; b.alt='before'; a.src=afterSrc; b.src=beforeSrc;
+  }
+  function staticOrPlaceholder(sc){
+    if(!sc.composite){ renderPlaceholder(sc); return; }
+    var im=new Image();
+    im.onload=function(){ renderStatic(im); };
+    im.onerror=function(){ renderPlaceholder(sc); };
+    im.alt=sc.label; im.src=sc.composite;
   }
 
   SCENES.forEach(function(sc,i){
@@ -168,12 +165,13 @@
 
   function at(e){var r=stage.getBoundingClientRect();var x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;setPos(x/r.width*100);}
   var drag=false;
-  stage.addEventListener('pointerdown',function(e){drag=true; stage.setPointerCapture&&stage.setPointerCapture(e.pointerId); at(e);});
-  stage.addEventListener('pointermove',function(e){if(drag)at(e);});
+  stage.addEventListener('pointerdown',function(e){if(mode!=='wipe')return;drag=true;stage.setPointerCapture&&stage.setPointerCapture(e.pointerId);at(e);});
+  stage.addEventListener('pointermove',function(e){if(drag&&mode==='wipe')at(e);});
   window.addEventListener('pointerup',function(){drag=false;});
   stage.addEventListener('keydown',function(e){
-    if(e.key==='ArrowLeft'){setPos(pos-2); e.preventDefault();}
-    if(e.key==='ArrowRight'){setPos(pos+2); e.preventDefault();}
+    if(mode!=='wipe')return;
+    if(e.key==='ArrowLeft'){setPos(pos-2);e.preventDefault();}
+    if(e.key==='ArrowRight'){setPos(pos+2);e.preventDefault();}
   });
 
   load(SCENES[0]);
