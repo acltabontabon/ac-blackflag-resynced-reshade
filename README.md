@@ -90,22 +90,42 @@ This is where the magic happens. A single selective color-grading pass replaces 
 
 ## 🚀 Installation
 
-### Step 1: Install ReShade
-1. Download **ReShade 6.7.3** from [reshade.me](https://reshade.me/)
-2. Run the installer and point it at your game executable (the one you actually launch to play)
-3. Let it auto-detect your rendering API
+Never used ReShade before? Follow these five steps exactly — it takes about 5 minutes.
 
-### Step 2: Install Effect Packages
-When the installer asks which effects to install, **check these three:**
-- **Standard effects** → provides `Deband`
-- **SweetFX by CeeJay.dk** → provides `SMAA` and `CAS`
-- **qUINT by Marty McFly** → provides `Lightroom`
+### Step 1 — Download the two files
+1. **ReShade** — get **version 6.7.3** from [reshade.me](https://reshade.me/) (the big download button).
+2. **This preset** — download the zip from the [Files tab on Nexus](https://www.nexusmods.com/assassinscreedblackflagresynced/mods/33?tab=files) and **extract it** somewhere you can find (e.g. your Desktop). Inside you get `AC4BF_OrangeBegone.ini` and `AC4BF_OrangeBegone_DLAA.ini`.
 
-### Step 3: Load the Preset
-1. Launch the game
-2. Press **Home** to open the ReShade overlay
-3. Click the preset browser at the top and browse for `AC4BF_OrangeBegone.ini`
-4. All four effects enable automatically in the correct order ✓
+### Step 2 — Run the ReShade installer
+1. **Close the game** first if it's running.
+2. Open the ReShade installer you downloaded. Click **"Click here to select a game..."**.
+3. Browse to the game's **main executable** — the `.exe` that actually launches gameplay, **not** a launcher or Ubisoft Connect.
+   - 💡 Easiest way to find it: in Steam, right-click the game → **Manage → Browse local files**, and pick the `.exe` in that folder.
+4. When it asks for the **rendering API**, choose **DirectX 12** (the Resynced remake is a DX12 game).
+
+### Step 3 — Tick the three effect packages
+The installer shows a checklist of shader collections. **Tick exactly these three** and click next:
+
+| Package | Gives you |
+|---|---|
+| ✅ **Standard effects** | `Deband` |
+| ✅ **SweetFX by CeeJay.dk** | `SMAA` + `CAS` |
+| ✅ **qUINT by Marty McFly** | `Lightroom` |
+
+Let it finish downloading, then close the installer.
+
+### Step 4 — Drop in the preset file
+Copy `AC4BF_OrangeBegone.ini` (and `AC4BF_OrangeBegone_DLAA.ini` if you use DLAA/DLSS — see [DLAA Variant](#-dlaa-variant)) into the **same folder as the game `.exe`** (the folder from Step 2).
+
+### Step 5 — Turn it on in-game
+1. Launch the game. The first time, ReShade shows a tutorial bar at the top — click **"Skip Tutorial"**.
+2. Press **Home** to open the ReShade overlay.
+3. At the very top there's a **preset dropdown** — click it and choose **`AC4BF_OrangeBegone`** (or `AC4BF_OrangeBegone_DLAA`).
+4. All effects switch on automatically. Press **Home** again to close the overlay. Done — press Home and toggle the preset any time to see the before/after. ✨
+
+> **Something not working?**
+> - **Overlay won't open (Home does nothing)?** ReShade was installed on the wrong `.exe`, or the wrong API was picked — re-run the installer and choose **DirectX 12**.
+> - **Preset shows red errors / `Lightroom` is missing?** The **qUINT** package wasn't ticked in Step 3 — re-run the installer and add it.
 
 ---
 
