@@ -103,8 +103,8 @@ Never used ReShade before? Follow these five steps exactly — it takes about 5 
    - 💡 Easiest way to find it: in Steam, right-click the game → **Manage → Browse local files**, and pick the `.exe` in that folder.
 4. When it asks for the **rendering API**, choose **DirectX 12** (the Resynced remake is a DX12 game).
 
-### Step 3 — Tick the three effect packages
-The installer shows a checklist of shader collections. **Tick exactly these three** and click next:
+### Step 3 — Install the shaders the preset needs
+The installer shows a checklist of shader collections. This step **downloads the actual shader files** the preset uses — the preset only *references* them, so if you skip this it'll load with red "could not find … .fx" errors and do nothing. **Tick exactly these three** and click next:
 
 | Package | Gives you |
 |---|---|
@@ -112,7 +112,7 @@ The installer shows a checklist of shader collections. **Tick exactly these thre
 | ✅ **SweetFX by CeeJay.dk** | `SMAA` + `CAS` |
 | ✅ **qUINT by Marty McFly** | `Lightroom` |
 
-Let it finish downloading, then close the installer.
+Let it finish downloading, then close the installer. (You don't enable anything by hand — loading the preset in Step 5 turns the effects on and orders them automatically.)
 
 ### Step 4 — Drop in the preset file
 Copy `AC4BF_OrangeBegone.ini` (and `AC4BF_OrangeBegone_DLAA.ini` if you use DLAA/DLSS — see [DLAA Variant](#-dlaa-variant)) into the **same folder as the game `.exe`** (the folder from Step 2).
