@@ -15,6 +15,25 @@
 
 ---
 
+## 🧭 Which File Do I Use?
+
+The download has **two preset files**. They both remove the same orange cast — the only difference is which one matches your anti-aliasing setting. Pick with one question:
+
+**In the game's Graphics settings, what is Anti-Aliasing / Upsampling set to?**
+
+| It's set to... | Use this file |
+|---|---|
+| **DLAA**, **DLSS** (any mode), or **TAA** | `AC4BF_OrangeBegone_DLAA.ini` |
+| **FXAA**, **MSAA**, **SMAA**, **Off**, or you're not sure | `AC4BF_OrangeBegone.ini` *(base — the safe default)* |
+
+**Why it matters, in plain terms:** DLAA/DLSS/TAA already smooth out jagged edges on their own. The base preset also smooths edges itself, so running it on top of DLAA/DLSS/TAA means doing that job twice — it wastes a little performance and can make the image very slightly softer. The DLAA variant skips that duplicate step and uses the extra headroom to sharpen the image a bit more instead, since DLAA/DLSS tend to leave things a touch soft on their own.
+
+If you're not sure what you're using, or you'd rather not think about it: **use the base preset.** It works correctly no matter what anti-aliasing you have on — you just won't get the small extra sharpness the DLAA variant adds.
+
+Only using one preset at a time is fine — pick one in Step 5 of the install guide below and don't load both together.
+
+---
+
 ## 📸 Before & After
 
 ### ▶ [Open the interactive comparison](https://acltabontabon.com/ac-blackflag-resynced-reshade/compare/)
@@ -115,7 +134,7 @@ The installer shows a checklist of shader collections. This step **downloads the
 Let it finish downloading, then close the installer. (You don't enable anything by hand — loading the preset in Step 5 turns the effects on and orders them automatically.)
 
 ### Step 4 — Drop in the preset file
-Copy `AC4BF_OrangeBegone.ini` (and `AC4BF_OrangeBegone_DLAA.ini` if you use DLAA/DLSS — see [DLAA Variant](#-dlaa-variant)) into the **same folder as the game `.exe`** (the folder from Step 2).
+Not sure which one you need? See **[Which File Do I Use?](#-which-file-do-i-use)** — it's one question. Copy that `.ini` file into the **same folder as the game `.exe`** (the folder from Step 2).
 
 ### Step 5 — Turn it on in-game
 1. Launch the game. The first time, ReShade shows a tutorial bar at the top — click **"Skip Tutorial"**.
@@ -153,6 +172,8 @@ Works fine with the preset — no changes needed. ReShade applies to the rendere
 ---
 
 ## 🧬 DLAA Variant
+
+> Not sure which file to use? See **[Which File Do I Use?](#-which-file-do-i-use)** above for the short version. This section is the technical detail for people who want it.
 
 Using **DLAA, DLSS, or TAA**? The download also includes **`AC4BF_OrangeBegone_DLAA.ini`**, with those tweaks already baked in — no overlay fiddling needed:
 
