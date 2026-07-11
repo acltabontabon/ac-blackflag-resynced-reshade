@@ -17,21 +17,13 @@
 
 ## 📸 Before & After
 
-> ▶ **[Interactive comparison](https://acltabontabon.com/ac-blackflag-resynced-reshade/compare/)** — drag a slider to wipe between vanilla and the preset.
+### ▶ [Open the interactive comparison](https://acltabontabon.com/ac-blackflag-resynced-reshade/compare/)
 
-Each shot is split down the middle — **left is vanilla** (the orange cast), **right is the preset**.
+Drag a slider to wipe between vanilla and the preset across seven scenes — Street, Encounter, Cityscape, Church, Ladies, Crew, and Portrait.
 
-**Havana rooftops**
-![Havana rooftops before/after](docs/images/base/havana-rooftops.jpg)
+[![Before/after preview — click to open the interactive comparison](docs/images/base/havana-rooftops.jpg)](https://acltabontabon.com/ac-blackflag-resynced-reshade/compare/)
 
-**Harbor & open water**
-![Harbor before/after](docs/images/base/harbor.jpg)
-
-**Town square**
-![Town square before/after](docs/images/base/town-square.jpg)
-
-**Character faces & skin tones**
-![NPC faces before/after](docs/images/base/faces.jpg)
+*Left is vanilla (the orange cast), right is the preset. Click the image to compare interactively.*
 
 ---
 
