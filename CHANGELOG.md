@@ -2,7 +2,7 @@
 
 All notable changes to Orange Begone preset are documented here.
 
-## [1.1.1] – 2026-07-11
+## [1.1.2] – 2026-07-12
 
 DLAA variant only. The base preset is unchanged.
 
@@ -13,9 +13,15 @@ DLAA variant only. The base preset is unchanged.
 - **DLAA variant:** Deband `t1` lowered to 0.005 (was 0.007). DLAA's temporal jitter
   already acts as mild dithering, so Deband can smooth less aggressively and preserve
   more fine detail. Revert to 0.007 if banding reappears in night skies.
+- **DLAA variant:** `ORANGE_SATURATION` set to -0.20 (was -0.18 in the base preset).
+  An interim build of this release shipped -0.22, which over-drained the orange band and
+  made skin read ashy — dark skin in night interiors and lit faces in direct daylight
+  both showed it, which pointed at the preset rather than the game. `ORANGE_HUESHIFT`
+  (-0.06) is unchanged and is the lever that actually removes the orange cast, so -0.20
+  keeps nearly all of the correction while giving skin its warmth back.
 
-Both changes are spatial-only and do not touch hue, saturation, or white balance — the
-orange fix is unaffected. `ORANGE_SATURATION` deliberately stays at -0.22.
+Both CAS and Deband changes are spatial-only and do not touch hue, saturation, or white
+balance, so they cannot affect the orange fix.
 
 ### Added
 - **DLAA variant:** documented the NVIDIA driver settings the preset assumes — leave the
