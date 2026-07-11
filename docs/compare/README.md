@@ -4,7 +4,8 @@ A self-contained page (`index.html`) — no build step, no dependencies.
 
 Every scene is an **interactive drag-wipe** built from a matched pair of full frames
 (same spot, ReShade off + on) at `images/<id>-before.jpg` and `images/<id>-after.jpg`.
-Current scenes: `street`, `encounter` (DLAA variant).
+Current scenes: `street`, `encounter`, `cityscape`, `church`, `ladies`, `crew`, `portrait`
+(all captured with the DLAA variant).
 
 ## Add an interactive scene
 

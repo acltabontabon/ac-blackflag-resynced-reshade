@@ -62,7 +62,7 @@
 <div class="wrap">
   <header>
     <h1>Orange Begone — before / after</h1>
-    <p class="sub">A ReShade preset that removes the orange cast from Assassin's Creed IV: Black Flag Resynced. Drag the handle to compare.</p>
+    <p class="sub">A ReShade preset that removes the orange cast from Assassin's Creed IV: Black Flag Resynced. Shots captured with the DLAA variant — drag the handle to compare.</p>
   </header>
 
   <div class="tabs" id="tabs" role="tablist" aria-label="Scenes"></div>
@@ -90,8 +90,13 @@
 <script>
 (function(){
   var SCENES=[
-    {label:'Street (DLAA)',    before:'images/street-before.jpg',    after:'images/street-after.jpg',    cap:'Skin and stone lose the orange without going gray.'},
-    {label:'Encounter (DLAA)', before:'images/encounter-before.jpg', after:'images/encounter-after.jpg', cap:'The purple dress and blue wall emerge from under the cast.'}
+    {label:'Street',    before:'images/street-before.jpg',    after:'images/street-after.jpg',    cap:'Skin and stone lose the orange without going gray.'},
+    {label:'Encounter', before:'images/encounter-before.jpg', after:'images/encounter-after.jpg', cap:'The purple dress and blue wall emerge from under the cast.'},
+    {label:'Cityscape', before:'images/cityscape-before.jpg', after:'images/cityscape-after.jpg', cap:'Golden rooftops and haze become natural terracotta and clean sky.'},
+    {label:'Church',    before:'images/church-before.jpg',    after:'images/church-after.jpg',    cap:'The mission facade drops its orange wash; stone reads neutral.'},
+    {label:'Ladies',    before:'images/ladies-before.jpg',    after:'images/ladies-after.jpg',    cap:'Faces and gowns look natural, not golden.'},
+    {label:'Crew',      before:'images/crew-before.jpg',      after:'images/crew-after.jpg',      cap:'Sunlit skin stays warm but no longer orange.'},
+    {label:'Portrait',  before:'images/portrait-before.jpg',  after:'images/portrait-after.jpg',  cap:'Close-up skin tone — natural, not orange or gray.'}
   ];
 
   var afterEl=document.getElementById('after'), beforeEl=document.getElementById('before');
