@@ -2,14 +2,9 @@
 
 A self-contained page (`index.html`) — no build step, no dependencies.
 
-Each scene is one of two kinds:
-
-- **Interactive drag-wipe** — needs a matched pair of full frames (same spot, ReShade
-  off + on) at `images/<id>-before.jpg` and `images/<id>-after.jpg`.
-  Current interactive scenes: `street`, `encounter` (DLAA variant).
-- **Static split** — falls back to an existing before/after composite in
-  `../images/base/<id>.jpg`. Current static scenes: Havana rooftops, Harbor, Town
-  square, Faces.
+Every scene is an **interactive drag-wipe** built from a matched pair of full frames
+(same spot, ReShade off + on) at `images/<id>-before.jpg` and `images/<id>-after.jpg`.
+Current scenes: `street`, `encounter` (DLAA variant).
 
 ## Add an interactive scene
 

@@ -34,8 +34,6 @@
     border:1px solid var(--line); border-radius:var(--radius); overflow:hidden;
     cursor:ew-resize; user-select:none; touch-action:none;
   }
-  .stage.static{cursor:default}
-  .stage.static .divider,.stage.static .knob,.stage.static .tag,.stage.static .hint{display:none}
   .stage:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
   .layer{position:absolute; inset:0}
   .layer img{width:100%; height:100%; object-fit:cover; display:block}
@@ -49,6 +47,9 @@
   .tag{position:absolute; top:12px; font-size:12px; font-weight:600; letter-spacing:.05em; color:#fff; background:rgba(0,0,0,.5); padding:4px 9px; border-radius:8px}
   .tag.l{left:12px} .tag.r{right:12px}
   .hint{position:absolute; bottom:12px; left:50%; transform:translateX(-50%); font-size:12px; color:#fff; background:rgba(0,0,0,.45); padding:4px 11px; border-radius:999px}
+  .msg{position:absolute; inset:0; display:none; align-items:center; justify-content:center; text-align:center; padding:24px; color:var(--muted); font-size:14px; background:var(--panel)}
+  .msg.show{display:flex}
+  .hidden{display:none}
   .cap{color:var(--muted); font-size:13px; margin:12px 2px 0; min-height:18px}
   footer{margin-top:22px; color:var(--muted); font-size:13px}
   footer a{color:var(--accent); text-decoration:none}
@@ -61,7 +62,7 @@
 <div class="wrap">
   <header>
     <h1>Orange Begone — before / after</h1>
-    <p class="sub">A ReShade preset that removes the orange cast from Assassin's Creed IV: Black Flag Resynced.</p>
+    <p class="sub">A ReShade preset that removes the orange cast from Assassin's Creed IV: Black Flag Resynced. Drag the handle to compare.</p>
   </header>
 
   <div class="tabs" id="tabs" role="tablist" aria-label="Scenes"></div>
@@ -76,6 +77,7 @@
     <span class="tag l">BEFORE · vanilla</span>
     <span class="tag r">AFTER · preset</span>
     <span class="hint">drag to compare</span>
+    <div class="msg" id="msg">Couldn't load this scene's images — try a refresh.</div>
   </div>
   <p class="cap" id="cap"></p>
 
@@ -88,18 +90,14 @@
 <script>
 (function(){
   var SCENES=[
-    {label:'Street (DLAA)',    before:'images/street-before.jpg',    after:'images/street-after.jpg',    cap:'DLAA variant — drag to compare. Skin and stone lose the orange without going gray.'},
-    {label:'Encounter (DLAA)', before:'images/encounter-before.jpg', after:'images/encounter-after.jpg', cap:'DLAA variant — drag to compare. The purple dress and blue wall emerge from under the cast.'},
-    {label:'Havana rooftops',  composite:'../images/base/havana-rooftops.jpg', cap:'Golden rooftops and haze pulled back to natural terracotta and clean sky.'},
-    {label:'Harbor',           composite:'../images/base/harbor.jpg',          cap:'Open water reads properly blue instead of warm.'},
-    {label:'Town square',      composite:'../images/base/town-square.jpg',     cap:'Sand and stone lose the orange tint; painted walls stay vivid.'},
-    {label:'Faces',            composite:'../images/base/faces.jpg',           cap:'Skin looks natural — not orange, not gray.'}
+    {label:'Street (DLAA)',    before:'images/street-before.jpg',    after:'images/street-after.jpg',    cap:'Skin and stone lose the orange without going gray.'},
+    {label:'Encounter (DLAA)', before:'images/encounter-before.jpg', after:'images/encounter-after.jpg', cap:'The purple dress and blue wall emerge from under the cast.'}
   ];
 
   var afterEl=document.getElementById('after'), beforeEl=document.getElementById('before');
   var stage=document.getElementById('stage'), divider=document.getElementById('divider'), knob=document.getElementById('knob');
-  var cap=document.getElementById('cap'), tabsEl=document.getElementById('tabs');
-  var mode='wipe', pos=50;
+  var msg=document.getElementById('msg'), cap=document.getElementById('cap'), tabsEl=document.getElementById('tabs');
+  var pos=50, token=0;
 
   function setPos(p){
     pos=Math.max(0,Math.min(100,p));
@@ -108,31 +106,20 @@
     stage.setAttribute('aria-valuenow', Math.round(pos));
   }
 
-  function renderWipe(a,b,sc){
-    mode='wipe'; stage.classList.remove('static');
-    afterEl.innerHTML=''; afterEl.appendChild(a);
-    beforeEl.innerHTML=''; beforeEl.appendChild(b);
-    cap.textContent=sc.cap||''; setPos(50);
-  }
-  function renderStatic(im,sc){
-    mode='static'; stage.classList.add('static');
-    afterEl.innerHTML=''; afterEl.appendChild(im); beforeEl.innerHTML='';
-    cap.textContent=sc.cap||'';
-  }
-
   function load(sc){
-    if(sc.before && sc.after){
-      var a=new Image(), b=new Image(), pending=2, failed=false;
-      function ready(){ if(--pending===0 && !failed) renderWipe(a,b,sc); }
-      function fail(){ if(!failed){ failed=true; if(sc.composite) staticImg(sc); } }
-      a.onload=ready; b.onload=ready; a.onerror=fail; b.onerror=fail;
-      a.alt='after'; b.alt='before'; a.src=sc.after; b.src=sc.before;
-    } else { staticImg(sc); }
-  }
-  function staticImg(sc){
-    var im=new Image(); im.alt=sc.label;
-    im.onload=function(){ renderStatic(im,sc); };
-    im.src=sc.composite;
+    var my=++token;
+    msg.classList.remove('show'); cap.textContent='';
+    var a=new Image(), b=new Image(), pending=2;
+    function ready(){ if(--pending) return; if(my!==token) return;
+      afterEl.innerHTML=''; afterEl.appendChild(a);
+      beforeEl.innerHTML=''; beforeEl.appendChild(b);
+      cap.textContent=sc.cap||''; setPos(50);
+    }
+    function fail(){ if(my!==token) return;
+      afterEl.innerHTML=''; beforeEl.innerHTML=''; msg.classList.add('show');
+    }
+    a.onload=ready; b.onload=ready; a.onerror=fail; b.onerror=fail;
+    a.alt='after'; b.alt='before'; a.src=sc.after; b.src=sc.before;
   }
 
   SCENES.forEach(function(sc,i){
@@ -148,11 +135,10 @@
 
   function at(e){var r=stage.getBoundingClientRect();var x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;setPos(x/r.width*100);}
   var drag=false;
-  stage.addEventListener('pointerdown',function(e){if(mode!=='wipe')return;drag=true;stage.setPointerCapture&&stage.setPointerCapture(e.pointerId);at(e);});
-  stage.addEventListener('pointermove',function(e){if(drag&&mode==='wipe')at(e);});
+  stage.addEventListener('pointerdown',function(e){drag=true;stage.setPointerCapture&&stage.setPointerCapture(e.pointerId);at(e);});
+  stage.addEventListener('pointermove',function(e){if(drag)at(e);});
   window.addEventListener('pointerup',function(){drag=false;});
   stage.addEventListener('keydown',function(e){
-    if(mode!=='wipe')return;
     if(e.key==='ArrowLeft'){setPos(pos-2);e.preventDefault();}
     if(e.key==='ArrowRight'){setPos(pos+2);e.preventDefault();}
   });
