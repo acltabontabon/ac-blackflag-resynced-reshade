@@ -17,7 +17,7 @@
 
 ## 📸 Before & After
 
-> ▶ **[Interactive comparison](https://acltabontabon.github.io/ac-blackflag-resynced-reshade/compare/)** — drag a slider to wipe between vanilla and the preset.
+> ▶ **[Interactive comparison](https://acltabontabon.com/ac-blackflag-resynced-reshade/compare/)** — drag a slider to wipe between vanilla and the preset.
 
 Each shot is split down the middle — **left is vanilla** (the orange cast), **right is the preset**.
 
