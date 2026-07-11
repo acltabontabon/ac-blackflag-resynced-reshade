@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Orange Begone — Before / After</title>
-<meta name="description" content="Before/after gallery for the Orange Begone ReShade preset (AC4 Black Flag Resynced)." />
+<meta name="description" content="Interactive before/after for the Orange Begone ReShade preset (AC4 Black Flag Resynced)." />
 <style>
   :root{
     --bg:#0e1114; --panel:#161b20; --line:#2a333c; --text:#eef2f5; --muted:#9fb0bd;
@@ -32,9 +32,24 @@
   .stage{
     position:relative; width:100%; aspect-ratio:16/9; background:#000;
     border:1px solid var(--line); border-radius:var(--radius); overflow:hidden;
+    cursor:ew-resize; user-select:none; touch-action:none;
   }
-  .stage img{width:100%; height:100%; object-fit:cover; display:block}
-  .cap{color:var(--muted); font-size:13px; margin:12px 2px 0}
+  .stage.static{cursor:default}
+  .stage.static .divider,.stage.static .knob,.stage.static .tag,.stage.static .hint{display:none}
+  .stage:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .layer{position:absolute; inset:0}
+  .layer img{width:100%; height:100%; object-fit:cover; display:block}
+  #before{clip-path:inset(0 50% 0 0)}
+  .divider{position:absolute; top:0; bottom:0; left:50%; width:2px; background:#fff; box-shadow:0 0 0 1px rgba(0,0,0,.35)}
+  .knob{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:38px; height:38px; border-radius:50%; background:#fff; color:#111;
+    display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 1px rgba(0,0,0,.35)
+  }
+  .tag{position:absolute; top:12px; font-size:12px; font-weight:600; letter-spacing:.05em; color:#fff; background:rgba(0,0,0,.5); padding:4px 9px; border-radius:8px}
+  .tag.l{left:12px} .tag.r{right:12px}
+  .hint{position:absolute; bottom:12px; left:50%; transform:translateX(-50%); font-size:12px; color:#fff; background:rgba(0,0,0,.45); padding:4px 11px; border-radius:999px}
+  .cap{color:var(--muted); font-size:13px; margin:12px 2px 0; min-height:18px}
   footer{margin-top:22px; color:var(--muted); font-size:13px}
   footer a{color:var(--accent); text-decoration:none}
   @media (prefers-color-scheme: light){
@@ -46,13 +61,21 @@
 <div class="wrap">
   <header>
     <h1>Orange Begone — before / after</h1>
-    <p class="sub">A ReShade preset that removes the orange cast from Assassin's Creed IV: Black Flag Resynced. Each shot is split down the middle — left is vanilla, right is the preset.</p>
+    <p class="sub">A ReShade preset that removes the orange cast from Assassin's Creed IV: Black Flag Resynced.</p>
   </header>
 
   <div class="tabs" id="tabs" role="tablist" aria-label="Scenes"></div>
 
-  <div class="stage">
-    <img id="shot" alt="" />
+  <div class="stage" id="stage" tabindex="0" role="slider" aria-label="Comparison wipe" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+    <div class="layer" id="after"></div>
+    <div class="layer" id="before"></div>
+    <div class="divider" id="divider"></div>
+    <div class="knob" id="knob" aria-hidden="true">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 7 3 12 8 17"/><polyline points="16 7 21 12 16 17"/></svg>
+    </div>
+    <span class="tag l">BEFORE · vanilla</span>
+    <span class="tag r">AFTER · preset</span>
+    <span class="hint">drag to compare</span>
   </div>
   <p class="cap" id="cap"></p>
 
@@ -65,17 +88,52 @@
 <script>
 (function(){
   var SCENES=[
-    {label:'Havana rooftops', src:'../images/base/havana-rooftops.jpg', cap:'Golden rooftops and haze pulled back to natural terracotta and clean sky.'},
-    {label:'Harbor',          src:'../images/base/harbor.jpg',          cap:'Open water reads properly blue instead of warm.'},
-    {label:'Town square',     src:'../images/base/town-square.jpg',     cap:'Sand and stone lose the orange tint; painted walls stay vivid.'},
-    {label:'Faces',           src:'../images/base/faces.jpg',           cap:'Skin looks natural — not orange, not gray.'},
-    {label:'Street (DLAA)',   src:'../images/dlaa/street.jpg',          cap:'DLAA variant: same de-orange, tuned sharper for DLAA/DLSS.'},
-    {label:'Encounter (DLAA)',src:'../images/dlaa/encounter.jpg',       cap:'DLAA variant: the purple dress and blue wall emerge from under the cast.'}
+    {label:'Street (DLAA)',    before:'images/street-before.jpg',    after:'images/street-after.jpg',    cap:'DLAA variant — drag to compare. Skin and stone lose the orange without going gray.'},
+    {label:'Encounter (DLAA)', before:'images/encounter-before.jpg', after:'images/encounter-after.jpg', cap:'DLAA variant — drag to compare. The purple dress and blue wall emerge from under the cast.'},
+    {label:'Havana rooftops',  composite:'../images/base/havana-rooftops.jpg', cap:'Golden rooftops and haze pulled back to natural terracotta and clean sky.'},
+    {label:'Harbor',           composite:'../images/base/harbor.jpg',          cap:'Open water reads properly blue instead of warm.'},
+    {label:'Town square',      composite:'../images/base/town-square.jpg',     cap:'Sand and stone lose the orange tint; painted walls stay vivid.'},
+    {label:'Faces',            composite:'../images/base/faces.jpg',           cap:'Skin looks natural — not orange, not gray.'}
   ];
 
-  var shot=document.getElementById('shot'), cap=document.getElementById('cap'), tabsEl=document.getElementById('tabs');
+  var afterEl=document.getElementById('after'), beforeEl=document.getElementById('before');
+  var stage=document.getElementById('stage'), divider=document.getElementById('divider'), knob=document.getElementById('knob');
+  var cap=document.getElementById('cap'), tabsEl=document.getElementById('tabs');
+  var mode='wipe', pos=50;
 
-  function show(sc){ shot.src=sc.src; shot.alt=sc.label+' before/after'; cap.textContent=sc.cap; }
+  function setPos(p){
+    pos=Math.max(0,Math.min(100,p));
+    beforeEl.style.clipPath='inset(0 '+(100-pos)+'% 0 0)';
+    divider.style.left=pos+'%'; knob.style.left=pos+'%';
+    stage.setAttribute('aria-valuenow', Math.round(pos));
+  }
+
+  function renderWipe(a,b,sc){
+    mode='wipe'; stage.classList.remove('static');
+    afterEl.innerHTML=''; afterEl.appendChild(a);
+    beforeEl.innerHTML=''; beforeEl.appendChild(b);
+    cap.textContent=sc.cap||''; setPos(50);
+  }
+  function renderStatic(im,sc){
+    mode='static'; stage.classList.add('static');
+    afterEl.innerHTML=''; afterEl.appendChild(im); beforeEl.innerHTML='';
+    cap.textContent=sc.cap||'';
+  }
+
+  function load(sc){
+    if(sc.before && sc.after){
+      var a=new Image(), b=new Image(), pending=2, failed=false;
+      function ready(){ if(--pending===0 && !failed) renderWipe(a,b,sc); }
+      function fail(){ if(!failed){ failed=true; if(sc.composite) staticImg(sc); } }
+      a.onload=ready; b.onload=ready; a.onerror=fail; b.onerror=fail;
+      a.alt='after'; b.alt='before'; a.src=sc.after; b.src=sc.before;
+    } else { staticImg(sc); }
+  }
+  function staticImg(sc){
+    var im=new Image(); im.alt=sc.label;
+    im.onload=function(){ renderStatic(im,sc); };
+    im.src=sc.composite;
+  }
 
   SCENES.forEach(function(sc,i){
     var t=document.createElement('button');
@@ -83,12 +141,23 @@
     t.setAttribute('aria-selected', i===0?'true':'false');
     t.onclick=function(){
       [].forEach.call(tabsEl.children,function(c){c.setAttribute('aria-selected','false');});
-      t.setAttribute('aria-selected','true'); show(sc);
+      t.setAttribute('aria-selected','true'); load(sc);
     };
     tabsEl.appendChild(t);
   });
 
-  show(SCENES[0]);
+  function at(e){var r=stage.getBoundingClientRect();var x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;setPos(x/r.width*100);}
+  var drag=false;
+  stage.addEventListener('pointerdown',function(e){if(mode!=='wipe')return;drag=true;stage.setPointerCapture&&stage.setPointerCapture(e.pointerId);at(e);});
+  stage.addEventListener('pointermove',function(e){if(drag&&mode==='wipe')at(e);});
+  window.addEventListener('pointerup',function(){drag=false;});
+  stage.addEventListener('keydown',function(e){
+    if(mode!=='wipe')return;
+    if(e.key==='ArrowLeft'){setPos(pos-2);e.preventDefault();}
+    if(e.key==='ArrowRight'){setPos(pos+2);e.preventDefault();}
+  });
+
+  load(SCENES[0]);
 })();
 </script>
 </body>

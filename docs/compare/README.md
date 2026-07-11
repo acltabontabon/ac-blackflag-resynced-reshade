@@ -1,19 +1,25 @@
-# Before/after gallery
+# Before/after comparison page
 
-A self-contained page (`index.html`) that shows the Orange Begone before/after
-comparison shots with a scene picker. No build step, no dependencies, nothing to
-add — it displays the composite images already in `docs/images/`.
+A self-contained page (`index.html`) — no build step, no dependencies.
 
-## Add or change scenes
+Each scene is one of two kinds:
 
-Edit the `SCENES` array near the bottom of `index.html`. Each entry points at an
-image already in the repo, e.g.:
+- **Interactive drag-wipe** — needs a matched pair of full frames (same spot, ReShade
+  off + on) at `images/<id>-before.jpg` and `images/<id>-after.jpg`.
+  Current interactive scenes: `street`, `encounter` (DLAA variant).
+- **Static split** — falls back to an existing before/after composite in
+  `../images/base/<id>.jpg`. Current static scenes: Havana rooftops, Harbor, Town
+  square, Faces.
 
-```js
-{label:'Harbor', src:'../images/base/harbor.jpg', cap:'Open water reads properly blue.'}
-```
+## Add an interactive scene
 
-## Publish it (GitHub Pages)
+1. Capture two full-frame screenshots of the same spot — one ReShade off, one on
+   (don't move the camera between them).
+2. Save them as `images/<id>-before.jpg` + `images/<id>-after.jpg`.
+3. Add an entry to the `SCENES` array in `index.html`:
+   `{label:'My scene', before:'images/myscene-before.jpg', after:'images/myscene-after.jpg', cap:'…'}`
 
-Already enabled for this repo (Settings → Pages → `main` / `/docs`). The page is at:
+## Publish (GitHub Pages)
+
+Enabled for this repo (`main` / `/docs`). Live at:
 `https://acltabontabon.com/ac-blackflag-resynced-reshade/compare/`
